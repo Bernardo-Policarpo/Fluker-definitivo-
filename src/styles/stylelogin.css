@@ -1,0 +1,132 @@
+/* =========================
+   FLUKER - STYLELOGIN.CSS
+   Tema: Lilás moderno e limpo
+   ========================= */
+
+/* ====== RESET ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* ====== BODY ====== */
+body {
+    background-color: #e9d8ff; /* lilás claro */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ====== CONTAINER PRINCIPAL ====== */
+.corpo {
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+}
+
+/* ====== CABEÇALHO ====== */
+#NomeFluker {
+    font-family: "Lilita One", cursive;
+    font-size: 3rem;
+    color: #8b4dff; /* lilás mais forte */
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+}
+
+/* ====== FORMULÁRIO ====== */
+.login {
+    display: flex;
+    justify-content: center;
+}
+
+form {
+    width: 100%;
+}
+
+/* ====== LABELS ====== */
+#userTitle,
+#passwordTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #8b4dff;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+/* ====== INPUTS ====== */
+#enterUser,
+#enterPassword {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #b58dff;
+    border-radius: 25px;
+    background-color: transparent;
+    outline: none;
+    color: #431381;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    transition: 0.3s;
+    text-align: center;
+}
+
+#enterUser:focus,
+#enterPassword:focus {
+    border-color: #8b4dff;
+}
+
+/* ====== BOTÃO ENTRAR ====== */
+#loginButton {
+    width: 100%;
+    background-color: #a166ff;
+    color: #fff;
+    font-weight: 800;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 0;
+    cursor: pointer;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    transition: background 0.3s;
+}
+
+#loginButton:hover {
+    background-color: #8b4dff;
+}
+
+/* ====== LINKS ====== */
+.createAccount {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+#criarConta,
+#esqueciMinhaSenha {
+    background: none;
+    border: none;
+    color: #8b4dff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+#criarConta:hover,
+#esqueciMinhaSenha:hover {
+    text-decoration: underline;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 480px) {
+    #NomeFluker {
+        font-size: 2.5rem;
+    }
+
+    #loginButton {
+        font-size: 0.9rem;
+    }
+}
