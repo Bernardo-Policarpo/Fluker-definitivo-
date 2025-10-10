@@ -5,8 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fluker</title>
     <link rel="shortcut icon" href="./src/assets/images/Logo-Fluker.png" type="image/x-icon">
+    <link rel="stylesheet" href="./src/styles/stylelogin.css">
 </head>
 <body>
-      
+    <div class="corpo">
+        <header>
+            <div class="nome">
+                <h1 id="NomeFluker">Fluker</h1>
+            </div>
+        </header>
+        <main>
+            <div class="login">
+                <form action="" method="post" name="areaDeLogin">
+                    <div class="userArea">
+                            <label for="usuario" id="userTitle">Usuario</label><br>
+                            <input type="text" name="usuario" id="enterUser"><br><br>
+                    </div>
+                    <div class="passwordArea">
+                            <label for="senha" id="passwordTitle">Senha</label><br>
+                            <input type="password" name="senha" id="enterPassword"><br><br>
+                    </div>
+                    <div class="entrar">
+                        <input type="submit" id="loginButton" value="Entrar" name="loginButton"><br><br>
+                    </div>
+                    <div class="createAccount">
+                        <a href=""><button id="criarConta">Criar conta</button></a>
+                        <a href=""><button id="esqueciMinhaSenha">Esqueci minha senha</button></a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 </body>
 </html>
