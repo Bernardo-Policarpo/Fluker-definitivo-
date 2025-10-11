@@ -18,6 +18,10 @@
             <div class="login">
                 <form action="" method="post" name="areaDeLogin">
                     <div class="userArea">
+                            <label for="email" id="userTitle"> Endereço de e-mail</label><br>
+                            <input type="email" name="email" id="enterUser"><br><br>
+                    </div>
+                    <div class="userArea">
                             <label for="usuario" id="userTitle"> Nome de Usuario</label><br>
                             <input type="text" name="usuario" id="enterUser"><br><br>
                     </div>
@@ -26,7 +30,7 @@
                             <input type="password" name="senha" id="enterPassword"><br><br>
                     </div>
                     <div class="entrar">
-                        <input type="submit" id="loginButton" value="Registrar-se" name="loginButton"><br><br>
+                        <input type="submit" id="loginButton" value="Registrar-se" name="loginButton"  onclick="armazenar(); return false"><br><br>
                     </div>
                 </form>
             </div>
@@ -35,5 +39,6 @@
             <a href="../../index.html"><button id="criarConta">Retornar a página de login</button></a>
         </div>
     </div>
+    <script src="../scripts/criarconta.js"></script>
 </body>
 </html>
