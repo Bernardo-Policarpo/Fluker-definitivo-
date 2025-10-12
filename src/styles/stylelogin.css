@@ -30,7 +30,7 @@ body {
 /* ====== CABEÇALHO ====== */
 #NomeFluker {
     font-family: "Lilita One", cursive;
-    font-size: 3rem;
+    font-size: 2.8rem;
     color: #8b4dff; /* lilás mais forte */
     margin-bottom: 1.5rem;
     letter-spacing: 1px;
@@ -43,27 +43,39 @@ body {
 }
 
 form {
-    width: 100%;
+    width: 80%;
 }
 
 /* ====== LABELS ====== */
 #userTitle,
 #passwordTitle {
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 100;
     color: #8b4dff;
-    text-transform: uppercase;
     margin-bottom: 5px;
 }
 
 /* ====== INPUTS ====== */
-#enterUser,
-#enterPassword {
-    width: 100%;
+#enterUser{
+    height: 30px;
+    width: 90%;
     padding: 10px 15px;
     border: 2px solid #b58dff;
-    border-radius: 25px;
-    background-color: transparent;
+    background-color: white;
+    outline: none;
+    color: #431381;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    transition: 0.3s;
+    text-align: center;
+}
+
+#enterPassword {
+    height: 30px;
+    width: 90%;
+    padding: 10px 15px;
+    border: 2px solid #b58dff;
+    background-color: white;
     outline: none;
     color: #431381;
     font-size: 1rem;
@@ -79,16 +91,16 @@ form {
 
 /* ====== BOTÃO ENTRAR ====== */
 #loginButton {
-    width: 100%;
+    height: 45px;
+    width: 90%;
     background-color: #a166ff;
     color: #fff;
-    font-weight: 800;
+    font-weight: 700;
     border: none;
     border-radius: 25px;
-    padding: 12px 0;
+    padding: 5px 0;
     cursor: pointer;
     font-size: 1rem;
-    letter-spacing: 1px;
     transition: background 0.3s;
 }
 
@@ -129,4 +141,9 @@ form {
     #loginButton {
         font-size: 0.9rem;
     }
+}
+
+.corpo {
+    max-width: 400px;
+    max-height: 400px;
 }

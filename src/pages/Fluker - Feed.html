@@ -16,7 +16,7 @@
 
   <nav class="navbar fundo">
     <div class="container d-flex justify-content-between align-items-center">
-      <a class="navbar-brand fw-bold fs-3 cortexto mx-auto" href="#">Fluker</a>
+      <a class="navbar-brand fw-bold fs-3 cortexto mx-auto flukerLogo" href="#">Fluker</a>
 
       <!-- Menu dropdown com imagem -->
       <div class="dropdown fundo">
@@ -31,6 +31,78 @@
       </div>
     </div>
   </nav>
+  
+  <main class="container my-5 cortexto">
+  <div class="row justify-content-center ">
+    <div class="col-12 col-lg-8 margin">
+
+      <!-- Feed container (caixa grande) -->
+      <section class="feed-box p-5 rounded-3 fundo shadow-sm margin">
+
+        <!-- Cabeçalho do feed -->
+        <div class="d-flex align-items-center mb-4">
+          <h2 class="h4 mb-0 me-auto ">Feed</h2>
+          <small class="text-muted">Últimas publicações</small>
+        </div>
+
+        <!-- Post 1 -->
+        <article class="card mb-3 feed-post posts">
+          <div class="row g-0">
+            <div class="col-md-4">
+              <img src="../assets/images/Logo-Fluker.png" class="img-fluid rounded-start" alt="Post 1">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">Título do post 1</h5>
+                <p class="card-text">Um trecho curtinho do post pra chamar atenção. Explica a ideia principal em uma ou duas linhas.</p>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-primary btn-sm">Curtir</button>
+                  <button class="btn btn-outline-secondary btn-sm">Comentar</button>
+                  <a href="#" class="ms-auto text-muted small align-self-center">2h</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Post 2 -->
+        <article class="card mb-3 posts feed-post">
+          <div class="card-body">
+            <div class="d-flex align-items-start mb-2">
+              <img src="img/avatar2.jpg" alt="Avatar" class="rounded-circle me-3" width="48" height="48" style="object-fit:cover;">
+              <div>
+                <h6 class="mb-0">Nome do Autor</h6>
+                <small class="text-muted">Hoje · Público</small>
+              </div>
+            </div>
+            <p class="card-text">Aqui vai o conteúdo do post — pode ser texto longo, link, ou qualquer coisa que tu queira mostrar no feed.</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm">Curtir</button>
+              <button class="btn btn-outline-secondary btn-sm">Comentar</button>
+              <a href="#" class="ms-auto text-muted small align-self-center">5h</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Post 3 (exemplo com media) -->
+        <article class="card mb-0 feed-post posts">
+          <img src="img/post3.jpg" class="card-img-top" alt="Post 3">
+          <div class="card-body">
+            <h5 class="card-title">Outro post com imagem</h5>
+            <p class="card-text">Legenda da imagem ou descrição do post aqui. Pode ter mais conteúdo.</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm">Curtir</button>
+              <button class="btn btn-outline-secondary btn-sm">Comentar</button>
+              <a href="#" class="ms-auto text-muted small align-self-center">1d</a>
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+    </div>
+  </div>
+</main>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

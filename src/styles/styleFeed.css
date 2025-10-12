@@ -1,14 +1,17 @@
 body {
-    background-color: #5b3196;
+background-color: #e9d8ff;
 }
 .fundo {
-  background-color: #3b008d !important; /* cor roxa igual à da imagem */
+    background-color: #a166ff !important; /* cor roxa igual à da imagem */
+}
 
+.posts{
+    background-color: #e9d8ff
 }
 
 /* Texto Fluker */
 .cortexto {
-  color: #c6a4ff !important; /* roxo claro bonito */
+    color: #431381 !important; /* roxo claro bonito */
 }
 
 /* Imagem do perfil (bolinha) */
@@ -28,4 +31,48 @@ body {
 
 .foto-perfil img {
 max-width: 20px;
+}
+
+.flukerLogo {
+    font-family: "Lilita One", cursive;
+    font-size: 2.8rem;
+    color: #8b4dff; /* lilás mais forte */
+    letter-spacing: 1px;
+}
+
+/* Feed container (a "caixa grande") */
+.feed-box {
+  background: #ffffff;             /* fundo branco por padrão */
+  border: 1px solid rgba(0,0,0,0.06);
+  min-height: 400px;              /* ajusta conforme precisar */
+}
+
+/* Espaçamento e aparência dos posts */
+.feed-post {
+  border: none;
+}
+
+/* Imagens dos cards: manter altura consistente em colunas */
+.feed-post img {
+  max-height: 200px;
+  object-fit: cover;
+}
+
+/* Estética para títulos e botões */
+.feed-box .card-title {
+  font-weight: 600;
+}
+.feed-box .btn {
+  padding: .25rem .6rem;
+  font-size: .85rem;
+}
+
+/* Responsividade extra: reduzir imagens em telas pequenas */
+@media (max-width: 576px) {
+  .feed-post img { max-height: 160px; }
+  .feed-box { padding: 1rem; }
+}
+
+.margin {
+width: 102%;
 }
