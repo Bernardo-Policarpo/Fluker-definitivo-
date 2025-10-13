@@ -1,111 +1,193 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fluker</title>
-   <link rel="shortcut icon" href="../assets/images/Logo-Fluker.png" type="image/x-icon">
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- Teu CSS -->
-  <link rel="stylesheet" href="../styles/styleFeed.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FLUKER</title>
+    <link rel="stylesheet" href="../styles/styleFeed.css" />
+    <link rel="shortcut icon" href="../assets/images/Logo-Fluker.png" type="image/x-icon">
 </head>
+
 <body>
-
-  <nav class="navbar fundo">
-    <div class="container d-flex justify-content-between align-items-center">
-      <a class="navbar-brand fw-bold fs-3 cortexto mx-auto flukerLogo" href="#">Fluker</a>
-
-      <!-- Menu dropdown com imagem -->
-      <div class="dropdown fundo">
-        <button class="btn p-0 border-0 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="" alt="Perfil" class="foto-perfil">
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end fundo">
-          <li><a class="dropdown-item cortexto" href="#">Perfil</a></li>
-          <li><a class="dropdown-item cortexto" href="#">Configurações</a></li>
-          <li><a class="dropdown-item cortexto" href="#">Sair</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  
-  <main class="container my-5 cortexto">
-  <div class="row justify-content-center ">
-    <div class="col-12 col-lg-8 margin">
-
-      <!-- Feed container (caixa grande) -->
-      <section class="feed-box p-5 rounded-3 fundo shadow-sm margin">
-
-        <!-- Cabeçalho do feed -->
-        <div class="d-flex align-items-center mb-4">
-          <h2 class="h4 mb-0 me-auto ">Feed</h2>
-          <small class="text-muted">Últimas publicações</small>
+    <header>
+        <div class="header-left">
+            <img src="../assets/images/logo.png" alt="Logo FLUKER" class="logo" />
+            <h1 class="title-center">FLUKER</h1>
         </div>
-
-        <!-- Post 1 -->
-        <article class="card mb-3 feed-post posts">
-          <div class="row g-0">
-            <div class="col-md-4">
-              <img src="../assets/images/Logo-Fluker.png" class="img-fluid rounded-start" alt="Post 1">
+        <div class="user-menu">
+            <img src="../assets/images/perfil.jpg" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
+            <div class="menu-dropdown hidden" id="user-dropdown">
+                <ul>
+                    <li onclick="showSection('perfil')">Perfil</li>
+                    <li onclick="showSection('configuracoes')">Configurações</li>
+                    <li onclick="logout()">Sair</li>
+                </ul>
             </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">Título do post 1</h5>
-                <p class="card-text">Um trecho curtinho do post pra chamar atenção. Explica a ideia principal em uma ou duas linhas.</p>
-                <div class="d-flex gap-2">
-                  <button class="btn btn-outline-primary btn-sm">Curtir</button>
-                  <button class="btn btn-outline-secondary btn-sm">Comentar</button>
-                  <a href="#" class="ms-auto text-muted small align-self-center">2h</a>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <ul>
+                <li onclick="showSection('inicio')">Início</li>
+                <li onclick="showSection('notificacoes')">Notificações</li>
+                <li onclick="showSection('mensagens')">Mensagens</li>
+                <li onclick="showSection('videos')">Vídeos</li>
+                <li onclick="showSection('explorar')">Explorar</li>
+            </ul>
+        </aside>
+        <main>
+            <section id="perfil" class="content">
+                <div class="profile">
+                    <div class="avatar">
+                        <img src="../assets/images/perfil.jpg" alt="Foto de perfil" class="perfil-principal" />
+                    </div>
+                    <p>Seguidores: <strong>0</strong> | Seguindo: <strong>7</strong></p>
+                    <div class="buttons">
+                        <button>EDITAR PERFIL</button>
+                        <button>COMPARTILHAR PERFIL</button>
+                    </div>
+                    <div class="posts">
+                        <div class="post">Post 1</div>
+                        <div class="post">Post 2</div>
+                        <div class="post">Post 3</div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </article>
+            </section>
 
-        <!-- Post 2 -->
-        <article class="card mb-3 posts feed-post">
-          <div class="card-body">
-            <div class="d-flex align-items-start mb-2">
-              <img src="img/avatar2.jpg" alt="Avatar" class="rounded-circle me-3" width="48" height="48" style="object-fit:cover;">
-              <div>
-                <h6 class="mb-0">Nome do Autor</h6>
-                <small class="text-muted">Hoje · Público</small>
-              </div>
-            </div>
-            <p class="card-text">Aqui vai o conteúdo do post — pode ser texto longo, link, ou qualquer coisa que tu queira mostrar no feed.</p>
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary btn-sm">Curtir</button>
-              <button class="btn btn-outline-secondary btn-sm">Comentar</button>
-              <a href="#" class="ms-auto text-muted small align-self-center">5h</a>
-            </div>
-          </div>
-        </article>
+            <section id="inicio" class="content active">
+                <div class="feed-container">
+                    <div class="stories">
+                        <div class="story">
+                            <img src="../assets/images/perfil.jpg" alt="Story 1" class="story-img" />
+                        </div>
+                        <div class="story">
+                            <img src="../assets/images/perfil.jpg" alt="Story 2" class="story-img" />
+                        </div>
+                        <div class="story">
+                            <img src="../assets/images/perfil.jpg" alt="Story 3" class="story-img" />
+                        </div>
+                    </div>
 
-        <!-- Post 3 (exemplo com media) -->
-        <article class="card mb-0 feed-post posts">
-          <img src="img/post3.jpg" class="card-img-top" alt="Post 3">
-          <div class="card-body">
-            <h5 class="card-title">Outro post com imagem</h5>
-            <p class="card-text">Legenda da imagem ou descrição do post aqui. Pode ter mais conteúdo.</p>
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary btn-sm">Curtir</button>
-              <button class="btn btn-outline-secondary btn-sm">Comentar</button>
-              <a href="#" class="ms-auto text-muted small align-self-center">1d</a>
-            </div>
-          </div>
-        </article>
+                    <div class="posts">
+                        <div class="post">
+                            <div class="post-header">
+                                <img src="../assets/images/perfil.jpg" alt="Fluker" class="post-avatar" />
+                                <h3>Fluker</h3>
+                            </div>
+                            <p>FLUKER logo post</p>
+                        </div>
 
-      </section>
+                        <div class="post">
+                            <div class="post-header">
+                                <img src="../assets/images/perfil.jpg" alt="Bernardo" class="post-avatar" />
+                                <h3>Bernardo.Policarpo</h3>
+                            </div>
+                            <p>Post sobre o projeto Fluker</p>
+                        </div>
 
+                        <div class="post">
+                            <div class="post-header">
+                                <img src="../assets/images/perfil.jpg" alt="Lucas" class="post-avatar"/>
+                                <h3>Lucas.Gabriel</h3>
+                            </div>
+                            <p>Comentário sobre a plataforma</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="notificacoes" class="content">
+                <div class="notificacoes-container">
+                    <div class="notificacao">
+                        <p><strong>Bernardo-Policarpo</strong> curtiu seu post ❤️</p>
+                    </div>
+                    <div class="notificacao">
+                        <p><strong>Lucas, Gabrieli</strong> curtiu seu post ❤️</p>
+                    </div>
+                    <p class="empty">Não há mais notificações!</p>
+                </div>
+            </section>
+
+            <section id="mensagens" class="content">
+                <div class="mensagens-container">
+                    <div class="mensagem">
+                        <p><strong>Bernardo-Policarpo</strong><br> curtiu seu post </p>
+                    </div>
+                    <div class="mensagem">
+                        <p><strong>Lucas, Gabrieli</strong><br> curtiu seu post </p>
+                    </div>
+                    <p class="empty">Não há mais mensagens!</p>
+                </div>
+            </section>
+
+            <section id="videos" class="content">
+                <div class="video-container">
+                    <div class="video-thumbnail">
+                        <img src="../assets/images/logo.png" alt="Logo FLUKER" class="logo" />
+                        <div class="play-button">▶</div>
+                        <h2>A MELHOR EMPRESA DO BRASIL</h2>
+                    </div>
+                    <div class="video-info">
+                        <p><strong>Bernardo.Policarpo</strong><br> — Projeto Fluker</p>
+                    </div>
+                    <div class="video-actions">
+                        <span class="action">❤️</span>
+                        <span class="action">💬</span>
+                        <span class="action">🔄</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="explorar" class="content">
+                <div class="explorar-container">
+                    <div class="search-bar">
+                        <input type="text" placeholder="Pesquisar 🔍" />
+                    </div>
+
+                    <div class="explorar-item">
+                        <p><strong>Bernardo-Policarpo</strong></p>
+                    </div>
+                    <div class="explorar-item">
+                        <p><strong>Lucas, Gabrieli</strong></p>
+                    </div>
+
+                    <p class="empty">Não há mais interações!</p>
+                </div>
+            </section>
+
+            <section id="configuracoes" class="content">
+                <div class="configuracoes-container">
+                    <div class="config-item">
+                        <p><strong>Privacidade e Visibilidade</strong></p>
+                    </div>
+                    <div class="config-item">
+                        <p><strong>Segurança e Autenticação</strong></p>
+                    </div>
+                    <div class="config-item">
+                        <p><strong>Conteúdo e Experiência</strong></p>
+                    </div>
+                    <div class="config-item">
+                        <p><strong>Bloqueios e Moderação</strong></p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-  </div>
-</main>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <button class="chat-button" onclick="toggleChat()">CHAT ABERTO</button>
 
+    <div id="chat-box" class="chat-box hidden">
+        <div class="chat-header">CHAT ABERTO</div>
+        <div class="chat-body">
+            <!-- Aqui apareceriam as mensagens -->
+        </div>
+        <div class="chat-footer">ENVIAR MENSAGEM:</div>
+    </div>
+
+
+    <script src="../scripts/script.js"></script>
 </body>
+
 </html>
