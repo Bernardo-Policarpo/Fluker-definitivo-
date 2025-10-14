@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FLUKER</title>
-    <link rel="stylesheet" href="../styles/styleFeed.css" />
-    <link rel="shortcut icon" href="../assets/images/Logo-Fluker.png" type="image/x-icon">
+    <img src="{{ url_for('static', filename='images/Logo-Fluker.png') }}" alt="Logo">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleFeed.css') }}">
 </head>
 
 <body>
@@ -187,7 +187,7 @@
     </div>
 
 
-    <script src="../scripts/script.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 
 </html>

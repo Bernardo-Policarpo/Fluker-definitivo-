@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fluker</title>
-    <link rel="shortcut icon" href="./src/assets/images/Logo-Fluker.png" type="image/x-icon">
-    <link rel="stylesheet" href="./src/styles/stylelogin.css">
+    <img src="{{ url_for('static', filename='images/Logo-Fluker.png') }}" alt="Logo">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleLogin.css') }}">
 </head>
 <body>
     <div class="corpo">
@@ -16,24 +16,28 @@
         </header>
         <main>
             <div class="login">
-                <form action="" method="post" name="areaDeLogin">
+                <form action="/login" method="post" name="areaDeLogin">
                     <div class="userArea">
                             <label for="usuario" id="userTitle">Nome de usuário ou e-mail</label><br>
-                            <input type="text" name="usuario" id="enterUser"><br><br>
+                            <input type="text" name="usuario" id="enterUser" required><br><br>
                     </div>
                     <div class="passwordArea">
                             <label for="senha" id="passwordTitle">Senha</label><br>
-                            <input type="password" name="senha" id="enterPassword"><br><br>
+                            <input type="password" name="senha" id="enterPassword" required><br><br>
                     </div>
                     <div class="entrar">
                         <input type="submit" id="loginButton" value="Entrar" name="loginButton"><br><br>
                     </div>
+
+                    {% if request.args.get('erro') %}
+  <div class="erro" name="userPassMissing">Usuário ou senha inválidos.</div>
+{% endif %}
                 </form>
             </div>
         </main>
             <div class="createAccount">
-                <a href="./src/pages/createaccount.html"><button id="criarConta">Criar conta</button></a>
-                <a href="./src/pages/recoverpassword.html"><button id="esqueciMinhaSenha">Esqueci minha senha</button></a>
+                <a href="{{ url_for('register_page') }}"><button id="criarConta">Criar conta</button></a>
+                <a href="{{ url_for('recover_page') }}"><button id="esqueciMinhaSenha">Esqueci minha senha</button></a>
             </div>
     </div>
     

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar conta</title>
-    <link rel="shortcut icon" href="../assets/images/Logo-Fluker.png" type="image/x-icon">
-    <link rel="stylesheet" href="../styles/stylelogin.css">
+    <img src="{{ url_for('static', filename='images/Logo-Fluker.png') }}" alt="Logo">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleLogin.css') }}">
 </head>
 <body>
     <div class="corpo">
@@ -16,29 +16,29 @@
         </header>
         <main>
             <div class="login">
-                <form action="" method="post" name="areaDeLogin">
+                <form action="/salvar" method="post" name="areaDeLogin">
                     <div class="userArea">
                             <label for="email" id="userTitle"> Endereço de e-mail</label><br>
-                            <input type="email" name="email" id="enterUser"><br><br>
+                            <input type="email" name="email" id="enterUser" required><br><br>
                     </div>
                     <div class="userArea">
                             <label for="usuario" id="userTitle"> Nome de Usuario</label><br>
-                            <input type="text" name="usuario" id="enterUser"><br><br>
+                            <input type="text" name="usuario" id="enterUser" required><br><br>
                     </div>
                     <div class="passwordArea">
                             <label for="senha" id="passwordTitle">Criar Senha</label><br>
-                            <input type="password" name="senha" id="enterPassword"><br><br>
+                            <input type="password" name="senha" id="enterPassword" required><br><br>
                     </div>
                     <div class="entrar">
-                        <input type="submit" id="loginButton" value="Registrar-se" name="loginButton"  onclick="armazenar(); return false"><br><br>
+                        <input type="submit" id="loginButton" value="Registrar-se" name="loginButton"><br><br>
                     </div>
                 </form>
             </div>
         </main>
         <div class="createAccount">
-            <a href="../../index.html"><button id="criarConta">Retornar a página de login</button></a>
+            <a href="{{ url_for('index') }}"><button id="criarConta">Retornar à página de login</button></a>
         </div>
     </div>
-    <script src="../scripts/createaccount.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

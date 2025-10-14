@@ -1,3 +1,0 @@
-Paleta de cores do site: 
-#3b008d; background color das coisas
-#c6a4ff; texto 
