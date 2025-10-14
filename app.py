@@ -52,12 +52,10 @@ def salvar():
 @app.post('/login')
 def login():
     ensure_csv()
-    username = request.form.get('usuario', '').strip()
+    login_input = request.form.get('usuario', '').strip()
     password = request.form.get('senha', '').strip()
 
-    print('[DEBUG] Tentando login com:', username, password)
-
-    if not username or not password:
+    if not login_input or not password:
         # campos obrigatórios faltando → volta para a página inicial
         return redirect(url_for('index'))
 
@@ -65,8 +63,15 @@ def login():
     with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)  # usa cabeçalho: id, username, password, email
         for row in reader:
-            # Atenção: no CSV o cabeçalho está como 'username' e 'password'
-            if row.get('username') == username and row.get('password') == password:
+
+            row_user = (row.get('username') or '').strip()
+            row_email = (row.get('email') or '').strip()
+            row_pass = (row.get('password') or '').strip()
+
+            credencial_ok = (login_input == row_user) or (login_input == row_email)
+            senha_ok = (password == row_pass)
+
+            if credencial_ok and senha_ok:
                 # Login OK → vai para /home
                 return redirect(url_for('home_page'))
 

@@ -5,18 +5,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FLUKER</title>
-    <img src="{{ url_for('static', filename='images/Logo-Fluker.png') }}" alt="Logo">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/Logo-Fluker.png') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleFeed.css') }}">
 </head>
 
 <body>
     <header>
         <div class="header-left">
-            <img src="../assets/images/logo.png" alt="Logo FLUKER" class="logo" />
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
             <h1 class="title-center">FLUKER</h1>
         </div>
         <div class="user-menu">
-            <img src="../assets/images/perfil.jpg" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
+            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
             <div class="menu-dropdown hidden" id="user-dropdown">
                 <ul>
                     <li onclick="showSection('perfil')">Perfil</li>
@@ -41,7 +41,7 @@
             <section id="perfil" class="content">
                 <div class="profile">
                     <div class="avatar">
-                        <img src="../assets/images/perfil.jpg" alt="Foto de perfil" class="perfil-principal" />
+                        <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil" class="perfil-principal" />
                     </div>
                     <p>Seguidores: <strong>0</strong> | Seguindo: <strong>7</strong></p>
                     <div class="buttons">
@@ -60,20 +60,20 @@
                 <div class="feed-container">
                     <div class="stories">
                         <div class="story">
-                            <img src="../assets/images/perfil.jpg" alt="Story 1" class="story-img" />
+                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 1" class="story-img" />
                         </div>
                         <div class="story">
-                            <img src="../assets/images/perfil.jpg" alt="Story 2" class="story-img" />
+                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 2" class="story-img" />
                         </div>
                         <div class="story">
-                            <img src="../assets/images/perfil.jpg" alt="Story 3" class="story-img" />
+                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 3" class="story-img" />
                         </div>
                     </div>
 
                     <div class="posts">
                         <div class="post">
                             <div class="post-header">
-                                <img src="../assets/images/perfil.jpg" alt="Fluker" class="post-avatar" />
+                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Fluker" class="post-avatar" />
                                 <h3>Fluker</h3>
                             </div>
                             <p>FLUKER logo post</p>
@@ -81,7 +81,7 @@
 
                         <div class="post">
                             <div class="post-header">
-                                <img src="../assets/images/perfil.jpg" alt="Bernardo" class="post-avatar" />
+                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Bernardo" class="post-avatar" />
                                 <h3>Bernardo.Policarpo</h3>
                             </div>
                             <p>Post sobre o projeto Fluker</p>
@@ -89,7 +89,7 @@
 
                         <div class="post">
                             <div class="post-header">
-                                <img src="../assets/images/perfil.jpg" alt="Lucas" class="post-avatar"/>
+                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Lucas" class="post-avatar"/>
                                 <h3>Lucas.Gabriel</h3>
                             </div>
                             <p>Comentário sobre a plataforma</p>
@@ -125,7 +125,7 @@
             <section id="videos" class="content">
                 <div class="video-container">
                     <div class="video-thumbnail">
-                        <img src="../assets/images/logo.png" alt="Logo FLUKER" class="logo" />
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
                         <div class="play-button">▶</div>
                         <h2>A MELHOR EMPRESA DO BRASIL</h2>
                     </div>
@@ -187,7 +187,7 @@
     </div>
 
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 </body>
 
 </html>
