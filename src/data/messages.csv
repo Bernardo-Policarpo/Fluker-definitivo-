@@ -1,1 +1,5 @@
-id, sender_id, receiver_id, timestamp, content
+id,sender_id,receiver_id,timestamp,content
+1,1,2,2025-10-15T04:13:47.360296Z,salve
+2,2,1,2025-10-15T04:13:59.671589Z,e ai blz
+3,1,2,2025-10-15T04:16:24.006191Z,bom demais e tu
+4,2,1,2025-10-15T04:16:34.767656Z,o que tem feito?

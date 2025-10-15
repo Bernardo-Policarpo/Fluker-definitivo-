@@ -32,7 +32,9 @@
             <ul>
                 <li onclick="showSection('inicio')">Início</li>
                 <li onclick="showSection('notificacoes')">Notificações</li>
-                <li onclick="showSection('mensagens')">Mensagens</li>
+                <li>
+                <a href="{{ url_for('inbox') }}" class="nav-link">Mensagens</a>
+                </li>
                 <li onclick="showSection('videos')">Vídeos</li>
                 <li onclick="showSection('explorar')">Explorar</li>
             </ul>
@@ -176,18 +178,30 @@
         </main>
     </div>
 
-    <button class="chat-button" onclick="toggleChat()">CHAT ABERTO</button>
+    <button class="chat-button" onclick="toggleChat()">CHAT</button>
 
-    <div id="chat-box" class="chat-box hidden">
-        <div class="chat-header">CHAT ABERTO</div>
-        <div class="chat-body">
-            <!-- Aqui apareceriam as mensagens -->
-        </div>
-        <div class="chat-footer">ENVIAR MENSAGEM:</div>
+<div id="chat-box" class="chat-box hidden">
+  <div class="chat-header">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <strong>DM</strong>
+      <select id="chat-partner" title="Selecionar usuário"></select>
     </div>
+    <button class="chat-close" onclick="toggleChat()">×</button>
+  </div>
+
+  <div id="chat-messages" class="chat-body"></div>
+
+  <div class="chat-footer">
+    <input id="chat-input" type="text" placeholder="Digite sua mensagem..." />
+    <button id="chat-send">Enviar</button>
+  </div>
+</div>
 
 
-    <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+    <script>
+  window.CURRENT_USER_ID = "{{ session.get('user_id') }}";
+    </script>
+<script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 </body>
 
 </html>

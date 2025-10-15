@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from functools import wraps
 from datetime import datetime
 import secrets
@@ -44,23 +44,6 @@ def next_message_id():
         reader = csv.DictReader(f)
         ids = [int(r['id']) for r in reader if r.get('id')]
         return (max(ids) + 1) if ids else 1
-    
-def load_users():
-    ensure_csv()
-    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
-        return list(csv.DictReader(f))
-    
-def find_user_by_id(uid):
-    for u in load_users():
-        if u.get('id') == str(uid):
-            return u
-    return None
-
-def find_user_by_username_or_email(login_input):
-    for u in load_users():
-        if (u.get('username') or '').strip() == login_input or (u.get('email') or '').strip() == login_input:
-            return u
-    return None
     
 @app.route('/')
 def index():
@@ -138,6 +121,98 @@ def home_page():
 @app.get('/recover')
 def recover_page():
     return render_template('recoverpassword.html')
+
+def get_all_users():
+    ensure_csv()
+    users = []
+    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            users.append({
+                'id': r['id'],
+                'username': r['username'],
+                'email': r['email'],
+            })
+    return users
+
+def user_exists(user_id):
+    ensure_csv()
+    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            if r.get('id') == str(user_id):
+                return True
+    return False
+
+@app.get('/inbox')
+@login_required
+def inbox():
+    return redirect(url_for('home_page'))
+
+@app.get('/api/users')
+@login_required
+def api_users():
+    uid = str(session.get('user_id'))
+    users = [u for u in get_all_users() if u['id'] != uid]
+    return jsonify({'users': users})
+
+@app.get('/api/messages')
+@login_required
+def api_messages():
+    partner_id = request.args.get('partner_id', type=str)
+    since_id = request.args.get('since_id', default=0, type=int)
+    me = str(session.get('user_id'))
+
+    if not partner_id or not user_exists(partner_id):
+        return jsonify({'error': 'partner_id inválido'}), 400
+
+    ensure_messages_csv()
+    items = []
+    with open(MESSAGES_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            if not r.get('id'):
+                continue
+            try:
+                mid = int(r['id'])
+            except:
+                continue
+            if mid <= since_id:
+                continue
+            s = r['sender_id']
+            t = r['receiver_id']
+            if (s == me and t == partner_id) or (s == partner_id and t == me):
+                items.append({
+                    'id': mid,
+                    'sender_id': s,
+                    'receiver_id': t,
+                    'timestamp': r['timestamp'],
+                    'content': r['content'],
+                })
+    items.sort(key=lambda x: x['id'])
+    return jsonify({'messages': items})
+
+@app.post('/api/send')
+@login_required
+def api_send():
+    data = request.get_json(silent=True) or {}
+    partner_id = str(data.get('partner_id', '')).strip()
+    content = str(data.get('content', '')).strip()
+    me = str(session.get('user_id'))
+
+    if not partner_id or not user_exists(partner_id):
+        return jsonify({'error': 'partner_id inválido'}), 400
+    if not content:
+        return jsonify({'error': 'Mensagem vazia'}), 400
+
+    ensure_messages_csv()
+    mid = next_message_id()
+    now = datetime.utcnow().isoformat() + 'Z'
+    with open(MESSAGES_PATH, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow([mid, me, partner_id, now, content])
+
+    return jsonify({'ok': True, 'id': mid, 'timestamp': now})
 
 if __name__ == '__main__':
     app.run(debug=True)

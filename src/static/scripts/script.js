@@ -122,11 +122,160 @@ function toggleUserMenu() {
 }
 
 function logout() {
-  alert("Você saiu da conta.");
-  // Aqui você pode redirecionar ou limpar dados de sessão
+  // Navega para a rota Flask que limpa a sessão
+  try { event?.preventDefault?.(); } catch(_) {}
+  window.location.href = '/logout';
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   showSection("inicio");
   carregarFeed();
 });
+
+// ====== CHAT DM BASICO ======
+let CHAT = {
+  open: false,
+  partnerId: null,
+  lastMsgId: 0,
+  pollTimer: null,
+};
+
+function toggleChat() {
+  const box = document.getElementById('chat-box');
+  CHAT.open = !CHAT.open;
+  if (CHAT.open) {
+    box.classList.remove('hidden');
+    initChat();
+  } else {
+    box.classList.add('hidden');
+    stopPolling();
+  }
+}
+
+async function initChat() {
+  await loadUsers();
+  const sel = document.getElementById('chat-partner');
+  if (sel.options.length > 0) {
+    if (!CHAT.partnerId) CHAT.partnerId = sel.value;
+    await loadMessages(true);
+    startPolling();
+  }
+
+  document.getElementById('chat-partner').addEventListener('change', async (e) => {
+    CHAT.partnerId = e.target.value;
+    CHAT.lastMsgId = 0;
+    await loadMessages(true);
+  });
+
+  document.getElementById('chat-send').addEventListener('click', sendMessage);
+  document.getElementById('chat-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+}
+
+function startPolling() {
+  stopPolling();
+  CHAT.pollTimer = setInterval(async () => {
+    if (CHAT.partnerId) {
+      await loadMessages(false);
+    }
+  }, 3000);
+}
+
+function stopPolling() {
+  if (CHAT.pollTimer) {
+    clearInterval(CHAT.pollTimer);
+    CHAT.pollTimer = null;
+  }
+}
+
+async function loadUsers() {
+  try {
+    const res = await fetch('/api/users');
+    const data = await res.json();
+    const sel = document.getElementById('chat-partner');
+    sel.innerHTML = '';
+    data.users.forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.username || u.email || `user_${u.id}`;
+      sel.appendChild(opt);
+    });
+  } catch (e) {
+    console.error('Erro ao carregar usuários', e);
+  }
+}
+
+async function loadMessages(fullReload) {
+  if (!CHAT.partnerId) return;
+  try {
+    const url = new URL(window.location.origin + '/api/messages');
+    url.searchParams.set('partner_id', CHAT.partnerId);
+    if (!fullReload && CHAT.lastMsgId > 0) {
+      url.searchParams.set('since_id', CHAT.lastMsgId);
+    }
+    const res = await fetch(url.toString());
+    const data = await res.json();
+    const container = document.getElementById('chat-messages');
+
+    if (fullReload) {
+      container.innerHTML = '';
+      CHAT.lastMsgId = 0;
+    }
+
+    let added = 0;
+    (data.messages || []).forEach(m => {
+      if (m.id > CHAT.lastMsgId) CHAT.lastMsgId = m.id;
+      container.appendChild(renderMessage(m));
+      added++;
+    });
+
+    if (fullReload || added > 0) {
+      container.scrollTop = container.scrollHeight;
+    }
+  } catch (e) {
+    console.error('Erro ao carregar mensagens', e);
+  }
+}
+
+function renderMessage(m) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-line';
+
+  // timestamp curto
+  let hhmm = '';
+  try {
+    const d = new Date(m.timestamp);
+    const h = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    hhmm = `${h}:${min}`;
+  } catch { hhmm = ''; }
+
+  const who = (m.sender_id === window.CURRENT_USER_ID) ? 'me' : 'partner';
+
+  wrap.textContent = `[${hhmm}] <${who}>: ${m.content}`;
+  wrap.dataset.msgId = m.id;
+  wrap.classList.add(who === 'me' ? 'msg-me' : 'msg-partner');
+  return wrap;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = (input.value || '').trim();
+  if (!text || !CHAT.partnerId) return;
+
+  try {
+    const res = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ partner_id: CHAT.partnerId, content: text }),
+    });
+    const data = await res.json();
+    if (data && data.ok) {
+      input.value = '';
+      await loadMessages(false);
+    }
+  } catch (e) {
+    console.error('Erro ao enviar', e);
+  }
+}
