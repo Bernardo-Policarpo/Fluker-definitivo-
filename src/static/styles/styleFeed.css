@@ -760,3 +760,69 @@ input[type="text"] {
 .hidden {
   display: none;
 }
+
+.chat-modal {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 320px;
+  max-width: 90%;
+  background-color: #f5eaff;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-modal.hidden {
+  display: none;
+}
+
+.chat-header {
+  background-color: var(--cor-principal);
+  color: white;
+  padding: 12px;
+  font-weight: bold;
+  text-align: center;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.chat-body {
+  padding: 20px;
+  font-size: 14px;
+  color: var(--cor-texto);
+  min-height: 150px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.chat-footer {
+  background-color: #d1b3ff;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  color: var(--cor-texto);
+}
+
+.chat-modal button {
+  margin: 10px;
+  padding: 8px 16px;
+  background-color: var(--cor-principal);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.chat-modal button:hover {
+  background-color: var(--variacao);
+}

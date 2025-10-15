@@ -6,11 +6,6 @@ function showSection(id) {
   if (target) target.classList.add('active');
 }
 
-function toggleChat() {
-  const chatBox = document.getElementById('chat-box');
-  chatBox.classList.toggle('hidden');
-}
-
 const posts = [
   {
     usuario: "Fluker",
@@ -130,3 +125,13 @@ document.addEventListener("DOMContentLoaded", () => {
   showSection("inicio");
   carregarFeed();
 });
+
+function toggleChat() {
+  const modal = document.getElementById('modal-chat');
+  modal.classList.toggle('hidden');
+}
+
+function closeModal() {
+  const modal = document.getElementById('modal-chat');
+  modal.classList.add('hidden');
+}

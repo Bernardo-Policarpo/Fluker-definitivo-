@@ -16,7 +16,8 @@
             <h1 class="title-center">FLUKER</h1>
         </div>
         <div class="user-menu">
-            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
+            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo"
+                onclick="toggleUserMenu()" />
             <div class="menu-dropdown hidden" id="user-dropdown">
                 <ul>
                     <li onclick="showSection('perfil')">Perfil</li>
@@ -41,7 +42,8 @@
             <section id="perfil" class="content">
                 <div class="profile">
                     <div class="avatar">
-                        <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil" class="perfil-principal" />
+                        <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil"
+                            class="perfil-principal" />
                     </div>
                     <p>Seguidores: <strong>0</strong> | Seguindo: <strong>7</strong></p>
                     <div class="buttons">
@@ -60,20 +62,24 @@
                 <div class="feed-container">
                     <div class="stories">
                         <div class="story">
-                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 1" class="story-img" />
+                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 1"
+                                class="story-img" />
                         </div>
                         <div class="story">
-                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 2" class="story-img" />
+                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 2"
+                                class="story-img" />
                         </div>
                         <div class="story">
-                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 3" class="story-img" />
+                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 3"
+                                class="story-img" />
                         </div>
                     </div>
 
                     <div class="posts">
                         <div class="post">
                             <div class="post-header">
-                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Fluker" class="post-avatar" />
+                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Fluker"
+                                    class="post-avatar" />
                                 <h3>Fluker</h3>
                             </div>
                             <p>FLUKER logo post</p>
@@ -81,7 +87,8 @@
 
                         <div class="post">
                             <div class="post-header">
-                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Bernardo" class="post-avatar" />
+                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Bernardo"
+                                    class="post-avatar" />
                                 <h3>Bernardo.Policarpo</h3>
                             </div>
                             <p>Post sobre o projeto Fluker</p>
@@ -89,7 +96,8 @@
 
                         <div class="post">
                             <div class="post-header">
-                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Lucas" class="post-avatar"/>
+                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Lucas"
+                                    class="post-avatar" />
                                 <h3>Lucas.Gabriel</h3>
                             </div>
                             <p>Comentário sobre a plataforma</p>
@@ -176,15 +184,16 @@
         </main>
     </div>
 
-    <button class="chat-button" onclick="toggleChat()">CHAT ABERTO</button>
-
-    <div id="chat-box" class="chat-box hidden">
+    <button class="chat-button" onclick="toggleChat(); return false">CHAT ABERTO</button>
+    <div id="modal-chat" class="chat-modal hidden">
         <div class="chat-header">CHAT ABERTO</div>
         <div class="chat-body">
-            <!-- Aqui apareceriam as mensagens -->
+            <!-- Conteúdo do chat -->
         </div>
         <div class="chat-footer">ENVIAR MENSAGEM:</div>
+        <button onclick="closeModal()">Fechar</button>
     </div>
+
 
 
     <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
