@@ -12,6 +12,7 @@ DATA_DIR  = os.path.join(SRC_DIR, 'data')
 CSV_PATH  = os.path.join(DATA_DIR, 'users.csv')
 STATIC_DIR = os.path.join(SRC_DIR, 'static')
 MESSAGES_PATH = os.path.join(DATA_DIR, 'messages.csv')
+POSTS_PATH = os.path.join(DATA_DIR, 'posts.csv')  # novo arquivo para armazenar posts
 
 app = Flask(__name__, template_folder = PAGES_DIR, static_folder=STATIC_DIR)
 
@@ -31,6 +32,14 @@ def ensure_messages_csv():
             writer = csv.writer(f)
             writer.writerow(['id', 'sender_id', 'receiver_id', 'timestamp', 'content'])
 
+def ensure_posts_csv():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if not os.path.exists(POSTS_PATH):
+        with open(POSTS_PATH, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            # corrigido: timestamp antes de content
+            writer.writerow(['id', 'author_id', 'author_name', 'timestamp', 'content', 'likes'])
+
 def next_id():
     ensure_csv()
     with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
@@ -41,6 +50,13 @@ def next_id():
 def next_message_id():
     ensure_messages_csv()
     with open(MESSAGES_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        ids = [int(r['id']) for r in reader if r.get('id')]
+        return (max(ids) + 1) if ids else 1
+
+def next_post_id():
+    ensure_posts_csv()
+    with open(POSTS_PATH, 'r', newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         ids = [int(r['id']) for r in reader if r.get('id')]
         return (max(ids) + 1) if ids else 1
@@ -133,7 +149,56 @@ def logout():
 @app.get('/home')  # pós-login
 @login_required
 def home_page():
-    return render_template('feed.html')
+    ensure_posts_csv()
+    # lê os posts existentes
+    with open(POSTS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        posts = list(reader)
+    # ordena os posts (mais recentes primeiro)
+    posts.sort(key=lambda x: int(x['id']), reverse=True)
+    return render_template('feed.html', posts=posts, username=session.get('username'))
+
+@app.post('/postar')
+@login_required
+def postar():
+    ensure_posts_csv()
+    content = request.form.get('content', '').strip()
+    if not content:
+        return redirect(url_for('home_page'))
+
+    # salva o post no CSV
+    with open(POSTS_PATH, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        # corrigido: timestamp antes de content
+        writer.writerow([
+            next_post_id(),
+            session['user_id'],
+            session['username'],
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # timestamp primeiro
+            content,                                         # depois conteúdo
+            0
+        ])
+    return redirect(url_for('home_page'))
+
+@app.post('/curtir/<int:post_id>')
+@login_required
+def curtir(post_id):
+    ensure_posts_csv()
+    posts = []
+    # lê todos os posts
+    with open(POSTS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        posts = list(reader)
+    # incrementa curtida
+    for post in posts:
+        if int(post['id']) == post_id:
+            post['likes'] = str(int(post.get('likes', 0)) + 1)
+    # regrava o CSV atualizado
+    with open(POSTS_PATH, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=['id', 'author_id', 'author_name', 'timestamp', 'content', 'likes'])
+        writer.writeheader()
+        writer.writerows(posts)
+    return redirect(url_for('home_page'))
 
 @app.get('/recover')
 def recover_page():
