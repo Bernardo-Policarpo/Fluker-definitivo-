@@ -3,3 +3,5 @@ id,sender_id,receiver_id,timestamp,content
 2,2,1,2025-10-15T04:13:59.671589Z,e ai blz
 3,1,2,2025-10-15T04:16:24.006191Z,bom demais e tu
 4,2,1,2025-10-15T04:16:34.767656Z,o que tem feito?
+5,1,2,2025-10-15T05:39:48.419138Z,muito backend
+6,2,1,2025-10-15T05:39:54.082310Z,da hora

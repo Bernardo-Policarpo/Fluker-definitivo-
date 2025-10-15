@@ -1,207 +1,213 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FLUKER</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/Logo-Fluker.png') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleFeed.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLUKER</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/Logo-Fluker.png') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleFeed.css') }}">
 </head>
-
 <body>
-    <header>
-        <div class="header-left">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
-            <h1 class="title-center">FLUKER</h1>
+  <header>
+    <div class="header-left">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
+      <h1 class="title-center">FLUKER</h1>
+    </div>
+    <div class="user-menu">
+      <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
+      <div class="menu-dropdown hidden" id="user-dropdown">
+        <ul>
+          <li onclick="showSection('perfil')">Perfil</li>
+          <li onclick="showSection('configuracoes')">Configurações</li>
+          <li onclick="logout()">Sair</li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li onclick="showSection('inicio')">Início</li>
+        <li onclick="showSection('notificacoes')">Notificações</li>
+        <li>
+          <a href="{{ url_for('inbox') }}" class="nav-link">Mensagens</a>
+        </li>
+        <li onclick="showSection('videos')">Vídeos</li>
+        <li onclick="showSection('explorar')">Explorar</li>
+      </ul>
+    </aside>
+
+    <main>
+      <section id="perfil" class="content">
+        <div class="profile">
+          <div class="avatar">
+            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil" class="perfil-principal" />
+          </div>
+          <p>Seguidores: <strong>0</strong> | Seguindo: <strong>7</strong></p>
+          <div class="buttons">
+            <button>EDITAR PERFIL</button>
+            <button>COMPARTILHAR PERFIL</button>
+          </div>
+          <div class="posts">
+            <div class="post">Post 1</div>
+            <div class="post">Post 2</div>
+            <div class="post">Post 3</div>
+          </div>
         </div>
-        <div class="user-menu">
-            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
-            <div class="menu-dropdown hidden" id="user-dropdown">
-                <ul>
-                    <li onclick="showSection('perfil')">Perfil</li>
-                    <li onclick="showSection('configuracoes')">Configurações</li>
-                    <li onclick="logout()">Sair</li>
-                </ul>
+      </section>
+
+      <section id="inicio" class="content active">
+        <div class="feed-container">
+
+          <!-- Novo post: envia para a rota /postar (POST) que grava no CSV e redireciona -->
+          <form action="{{ url_for('postar') }}" method="POST" class="new-post-form">
+            <textarea name="content" rows="3" placeholder="Escreva um post..." required></textarea>
+            <div>
+              <button type="submit">Publicar</button>
             </div>
+          </form>
+
+          <!-- Lista de posts carregados do backend (app.py -> home_page) -->
+          <div class="posts">
+            {% if posts %}
+              {% for p in posts %}
+                <div class="post">
+                  <div class="post-header">
+                    <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="{{ p.author_name }}" class="post-avatar" />
+                    <div>
+                      <h3>{{ p.author_name }}</h3>
+                      <small>{{ p.timestamp }}</small>
+                    </div>
+                  </div>
+
+                  <!-- Conteúdo do post vem direto do CSV -->
+                  <p>{{ p.content }}</p>
+
+                  {# liked: true/false se o ID do usuário atual já está na lista de curtidas do post #}
+                  {% set liked = (p.get('likes_by') or '') and (user_id in (p.get('likes_by').split(';'))) %}
+
+                  <!-- Botão de curtir faz POST na rota /curtir/<id> que alterna like/unlike no CSV -->
+                  <form action="{{ url_for('curtir', post_id=p.id) }}" method="POST">
+                    <button type="submit">
+                      {% if liked %}Remover curtida{% else %}Curtir{% endif %} ({{ p.likes }})
+                    </button>
+                  </form>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="empty">Nenhum post ainda. Seja o primeiro a postar!</p>
+            {% endif %}
+          </div>
         </div>
-    </header>
+      </section>
 
-    <div class="layout">
-        <aside class="sidebar">
-            <ul>
-                <li onclick="showSection('inicio')">Início</li>
-                <li onclick="showSection('notificacoes')">Notificações</li>
-                <li>
-                <a href="{{ url_for('inbox') }}" class="nav-link">Mensagens</a>
-                </li>
-                <li onclick="showSection('videos')">Vídeos</li>
-                <li onclick="showSection('explorar')">Explorar</li>
-            </ul>
-        </aside>
-        <main>
-            <section id="perfil" class="content">
-                <div class="profile">
-                    <div class="avatar">
-                        <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil" class="perfil-principal" />
-                    </div>
-                    <p>Seguidores: <strong>0</strong> | Seguindo: <strong>7</strong></p>
-                    <div class="buttons">
-                        <button>EDITAR PERFIL</button>
-                        <button>COMPARTILHAR PERFIL</button>
-                    </div>
-                    <div class="posts">
-                        <div class="post">Post 1</div>
-                        <div class="post">Post 2</div>
-                        <div class="post">Post 3</div>
-                    </div>
-                </div>
-            </section>
+      <section id="notificacoes" class="content">
+        <div class="notificacoes-container">
+          <div class="notificacao">
+            <p><strong>Bernardo-Policarpo</strong> curtiu seu post ❤️</p>
+          </div>
+          <div class="notificacao">
+            <p><strong>Lucas, Gabrieli</strong> curtiu seu post ❤️</p>
+          </div>
+          <p class="empty">Não há mais notificações!</p>
+        </div>
+      </section>
 
-            <section id="inicio" class="content active">
-                <div class="feed-container">
-                    <div class="stories">
-                        <div class="story">
-                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 1" class="story-img" />
-                        </div>
-                        <div class="story">
-                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 2" class="story-img" />
-                        </div>
-                        <div class="story">
-                            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Story 3" class="story-img" />
-                        </div>
-                    </div>
+      <section id="mensagens" class="content">
+        <div class="mensagens-container">
+          <div class="mensagem">
+            <p><strong>Bernardo-Policarpo</strong><br> curtiu seu post </p>
+          </div>
+          <div class="mensagem">
+            <p><strong>Lucas, Gabrieli</strong><br> curtiu seu post </p>
+          </div>
+          <p class="empty">Não há mais mensagens!</p>
+        </div>
+      </section>
 
-                    <div class="posts">
-                        <div class="post">
-                            <div class="post-header">
-                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Fluker" class="post-avatar" />
-                                <h3>Fluker</h3>
-                            </div>
-                            <p>FLUKER logo post</p>
-                        </div>
+      <section id="videos" class="content">
+        <div class="video-container">
+          <div class="video-thumbnail">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
+            <div class="play-button">▶</div>
+            <h2>A MELHOR EMPRESA DO BRASIL</h2>
+          </div>
+          <div class="video-info">
+            <p><strong>Bernardo.Policarpo</strong><br> — Projeto Fluker</p>
+          </div>
+          <div class="video-actions">
+            <span class="action">❤️</span>
+            <span class="action">💬</span>
+            <span class="action">🔄</span>
+          </div>
+        </div>
+      </section>
 
-                        <div class="post">
-                            <div class="post-header">
-                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Bernardo" class="post-avatar" />
-                                <h3>Bernardo.Policarpo</h3>
-                            </div>
-                            <p>Post sobre o projeto Fluker</p>
-                        </div>
+      <section id="explorar" class="content">
+        <div class="explorar-container">
+          <div class="search-bar">
+            <input type="text" placeholder="Pesquisar 🔍" />
+          </div>
 
-                        <div class="post">
-                            <div class="post-header">
-                                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Lucas" class="post-avatar"/>
-                                <h3>Lucas.Gabriel</h3>
-                            </div>
-                            <p>Comentário sobre a plataforma</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          <div class="explorar-item">
+            <p><strong>Bernardo-Policarpo</strong></p>
+          </div>
+          <div class="explorar-item">
+            <p><strong>Lucas, Gabrieli</strong></p>
+          </div>
 
-            <section id="notificacoes" class="content">
-                <div class="notificacoes-container">
-                    <div class="notificacao">
-                        <p><strong>Bernardo-Policarpo</strong> curtiu seu post ❤️</p>
-                    </div>
-                    <div class="notificacao">
-                        <p><strong>Lucas, Gabrieli</strong> curtiu seu post ❤️</p>
-                    </div>
-                    <p class="empty">Não há mais notificações!</p>
-                </div>
-            </section>
+          <p class="empty">Não há mais interações!</p>
+        </div>
+      </section>
 
-            <section id="mensagens" class="content">
-                <div class="mensagens-container">
-                    <div class="mensagem">
-                        <p><strong>Bernardo-Policarpo</strong><br> curtiu seu post </p>
-                    </div>
-                    <div class="mensagem">
-                        <p><strong>Lucas, Gabrieli</strong><br> curtiu seu post </p>
-                    </div>
-                    <p class="empty">Não há mais mensagens!</p>
-                </div>
-            </section>
-
-            <section id="videos" class="content">
-                <div class="video-container">
-                    <div class="video-thumbnail">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
-                        <div class="play-button">▶</div>
-                        <h2>A MELHOR EMPRESA DO BRASIL</h2>
-                    </div>
-                    <div class="video-info">
-                        <p><strong>Bernardo.Policarpo</strong><br> — Projeto Fluker</p>
-                    </div>
-                    <div class="video-actions">
-                        <span class="action">❤️</span>
-                        <span class="action">💬</span>
-                        <span class="action">🔄</span>
-                    </div>
-                </div>
-            </section>
-
-            <section id="explorar" class="content">
-                <div class="explorar-container">
-                    <div class="search-bar">
-                        <input type="text" placeholder="Pesquisar 🔍" />
-                    </div>
-
-                    <div class="explorar-item">
-                        <p><strong>Bernardo-Policarpo</strong></p>
-                    </div>
-                    <div class="explorar-item">
-                        <p><strong>Lucas, Gabrieli</strong></p>
-                    </div>
-
-                    <p class="empty">Não há mais interações!</p>
-                </div>
-            </section>
-
-            <section id="configuracoes" class="content">
-                <div class="configuracoes-container">
-                    <div class="config-item">
-                        <p><strong>Privacidade e Visibilidade</strong></p>
-                    </div>
-                    <div class="config-item">
-                        <p><strong>Segurança e Autenticação</strong></p>
-                    </div>
-                    <div class="config-item">
-                        <p><strong>Conteúdo e Experiência</strong></p>
-                    </div>
-                    <div class="config-item">
-                        <p><strong>Bloqueios e Moderação</strong></p>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <button class="chat-button" onclick="toggleChat()">CHAT</button>
-
-<div id="chat-box" class="chat-box hidden">
-  <div class="chat-header">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <strong>DM</strong>
-      <select id="chat-partner" title="Selecionar usuário"></select>
-    </div>
-    <button class="chat-close" onclick="toggleChat()">×</button>
+      <section id="configuracoes" class="content">
+        <div class="configuracoes-container">
+          <div class="config-item">
+            <p><strong>Privacidade e Visibilidade</strong></p>
+          </div>
+          <div class="config-item">
+            <p><strong>Segurança e Autenticação</strong></p>
+          </div>
+          <div class="config-item">
+            <p><strong>Conteúdo e Experiência</strong></p>
+          </div>
+          <div class="config-item">
+            <p><strong>Bloqueios e Moderação</strong></p>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <div id="chat-messages" class="chat-body"></div>
+  <!-- Botão flutuante para abrir/fechar o chat -->
+  <button class="chat-button" onclick="toggleChat()">CHAT</button>
 
-  <div class="chat-footer">
-    <input id="chat-input" type="text" placeholder="Digite sua mensagem..." />
-    <button id="chat-send">Enviar</button>
+  <!-- Caixa de chat (DM) -->
+  <div id="chat-box" class="chat-box hidden">
+    <div class="chat-header">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <strong>DM</strong>
+        <!-- Select preenchido via /api/users com todos menos o usuário atual -->
+        <select id="chat-partner" title="Selecionar usuário"></select>
+      </div>
+      <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+
+    <!-- Mensagens do chat são carregadas via /api/messages (polling) -->
+    <div id="chat-messages" class="chat-body"></div>
+
+    <!-- Envio de mensagens chama /api/send (POST JSON) -->
+    <div class="chat-footer">
+      <input id="chat-input" type="text" placeholder="Digite sua mensagem..." />
+      <button id="chat-send">Enviar</button>
+    </div>
   </div>
-</div>
 
-
-    <script>
-  window.CURRENT_USER_ID = "{{ session.get('user_id') }}";
-    </script>
-<script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+  <!-- Exponho o ID do usuário atual para o script controlar "eu" vs "outro" nas DMs -->
+  <script>
+    window.CURRENT_USER_ID = "{{ session.get('user_id') }}";
+  </script>
+  <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 </body>
-
 </html>
