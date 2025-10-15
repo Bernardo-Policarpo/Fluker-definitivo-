@@ -11,43 +11,26 @@
   <header>
     <div class="header-left">
       <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
-      <h1 class="title-center">FLUKER</h1>
+      <button class="title-center" onclick="showSection('inicio')">FLUKER</button>
     </div>
     <div class="user-menu">
+      <img src="{{ url_for('static', filename='images/sino.png') }}" alt="Notificações" class="icone-sino" onclick="showSection('notificacoes')">
       <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
       <div class="menu-dropdown hidden" id="user-dropdown">
         <ul>
           <li onclick="showSection('perfil')">Perfil</li>
-          <li onclick="showSection('configuracoes')">Configurações</li>
-          <li onclick="logout()">Sair</li>
+          <li onclick="logout()">Sair</li> 
         </ul>
       </div>
     </div>
   </header>
 
   <div class="layout">
-    <aside class="sidebar">
-      <ul>
-        <li onclick="showSection('inicio')">Início</li>
-        <li onclick="showSection('notificacoes')">Notificações</li>
-        <li>
-          <a href="{{ url_for('inbox') }}" class="nav-link">Mensagens</a>
-        </li>
-        <li onclick="showSection('videos')">Vídeos</li>
-        <li onclick="showSection('explorar')">Explorar</li>
-      </ul>
-    </aside>
-
     <main>
       <section id="perfil" class="content">
         <div class="profile">
           <div class="avatar">
             <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil" class="perfil-principal" />
-          </div>
-          <p>Seguidores: <strong>0</strong> | Seguindo: <strong>7</strong></p>
-          <div class="buttons">
-            <button>EDITAR PERFIL</button>
-            <button>COMPARTILHAR PERFIL</button>
           </div>
           <div class="posts">
             <div class="post">Post 1</div>
@@ -126,42 +109,7 @@
         </div>
       </section>
 
-      <section id="videos" class="content">
-        <div class="video-container">
-          <div class="video-thumbnail">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
-            <div class="play-button">▶</div>
-            <h2>A MELHOR EMPRESA DO BRASIL</h2>
-          </div>
-          <div class="video-info">
-            <p><strong>Bernardo.Policarpo</strong><br> — Projeto Fluker</p>
-          </div>
-          <div class="video-actions">
-            <span class="action">❤️</span>
-            <span class="action">💬</span>
-            <span class="action">🔄</span>
-          </div>
-        </div>
-      </section>
-
-      <section id="explorar" class="content">
-        <div class="explorar-container">
-          <div class="search-bar">
-            <input type="text" placeholder="Pesquisar 🔍" />
-          </div>
-
-          <div class="explorar-item">
-            <p><strong>Bernardo-Policarpo</strong></p>
-          </div>
-          <div class="explorar-item">
-            <p><strong>Lucas, Gabrieli</strong></p>
-          </div>
-
-          <p class="empty">Não há mais interações!</p>
-        </div>
-      </section>
-
-      <section id="configuracoes" class="content">
+      <!--<section id="configuracoes" class="content">
         <div class="configuracoes-container">
           <div class="config-item">
             <p><strong>Privacidade e Visibilidade</strong></p>
@@ -176,7 +124,7 @@
             <p><strong>Bloqueios e Moderação</strong></p>
           </div>
         </div>
-      </section>
+      </section>-->
     </main>
   </div>
 

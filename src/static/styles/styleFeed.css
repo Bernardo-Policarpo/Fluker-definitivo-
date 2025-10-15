@@ -222,6 +222,8 @@ input[type="text"] {
   background-color: #f5eaff;
   padding: 20px;
   border-radius: 10px;
+  max-width: 850px;
+  margin: 0 auto;
 }
 
 .stories {
@@ -712,11 +714,19 @@ input[type="text"] {
 }
 
 .user-menu {
-  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px; /* Espaço entre sino e perfil */
   margin-right: 20px;
+}
+
+.icone-sino {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid white;
 }
 
 .perfil-topo {
