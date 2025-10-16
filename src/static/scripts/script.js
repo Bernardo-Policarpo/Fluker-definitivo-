@@ -303,3 +303,24 @@ async function syncLikesFromServer() {
     // silencioso; não precisa logar toda hora
   }
 }
+
+function toggleCurtida(botao) {
+  const img = botao.querySelector('img');
+  const form = botao.closest('form');
+
+  const liked = img.src.includes('redheart.png');
+
+  // Troca a imagem localmente
+  if (liked) {
+    img.src = '/static/images/coracao.png';
+  } else {
+    img.src = '/static/images/redheart.png';
+  }
+
+  // Animação
+  botao.classList.add('clicked');
+  setTimeout(() => botao.classList.remove('clicked'), 300);
+
+  // Envia o formulário para o Flask atualizar o estado real
+  form.submit();
+}

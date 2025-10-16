@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FLUKER</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/Logo-Fluker.png') }}" type="image/x-icon">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleFeed.css') }}">
+
 </head>
+
 <body>
   <header>
     <div class="header-left">
@@ -14,12 +17,14 @@
       <button class="title-center" onclick="showSection('inicio')">FLUKER</button>
     </div>
     <div class="user-menu">
-      <img src="{{ url_for('static', filename='images/sino.png') }}" alt="Notificações" class="icone-sino" onclick="showSection('notificacoes')">
-      <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo" onclick="toggleUserMenu()" />
+      <img src="{{ url_for('static', filename='images/sino.png') }}" alt="Notificações" class="icone-sino"
+        onclick="showSection('notificacoes')">
+      <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo"
+        onclick="toggleUserMenu()" />
       <div class="menu-dropdown hidden" id="user-dropdown">
         <ul>
           <li onclick="showSection('perfil')">Perfil</li>
-          <li onclick="logout()">Sair</li> 
+          <li onclick="logout()">Sair</li>
         </ul>
       </div>
     </div>
@@ -30,7 +35,8 @@
       <section id="perfil" class="content">
         <div class="profile">
           <div class="avatar">
-            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil" class="perfil-principal" />
+            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil"
+              class="perfil-principal" />
           </div>
           <div class="posts">
             <div class="post">Post 1</div>
@@ -54,32 +60,34 @@
           <!-- Lista de posts carregados do backend (app.py -> home_page) -->
           <div class="posts">
             {% if posts %}
-              {% for p in posts %}
-                <div class="post">
-                  <div class="post-header">
-                    <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="{{ p.author_name }}" class="post-avatar" />
-                    <div>
-                      <h3>{{ p.author_name }}</h3>
-                      <small>{{ p.timestamp }}</small>
-                    </div>
-                  </div>
-
-                  <!-- Conteúdo do post vem direto do CSV -->
-                  <p>{{ p.content }}</p>
-
-                  {# liked: true/false se o ID do usuário atual já está na lista de curtidas do post #}
-                  {% set liked = (p.get('likes_by') or '') and (user_id in (p.get('likes_by').split(';'))) %}
-
-                  <!-- Botão de curtir faz POST na rota /curtir/<id> que alterna like/unlike no CSV -->
-                  <form action="{{ url_for('curtir', post_id=p.id) }}" method="POST">
-                    <button type="submit">
-                      {% if liked %}Remover curtida{% else %}Curtir{% endif %} ({{ p.likes }})
-                    </button>
-                  </form>
+            {% for p in posts %}
+            <div class="post">
+              <div class="post-header">
+                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="{{ p.author_name }}"
+                  class="post-avatar" />
+                <div>
+                  <h3>{{ p.author_name }}</h3>
+                  <small>{{ p.timestamp }}</small>
                 </div>
-              {% endfor %}
+              </div>
+
+              <!-- Conteúdo do post vem direto do CSV -->
+              <p>{{ p.content }}</p>
+
+              {# liked: true/false se o ID do usuário atual já está na lista de curtidas do post #}
+              {% set liked = (p.get('likes_by') or '') and (user_id in (p.get('likes_by').split(';'))) %}
+
+              <!-- Botão de curtir faz POST na rota /curtir/<id> que alterna like/unlike no CSV -->
+              <form action="{{ url_for('curtir', post_id=p.id) }}" method="POST" id="form-like-{{ p.id }}">
+                <button type="button" class="heart-btn" onclick="toggleCurtida(this)">
+                  <img src="{{ url_for('static', filename='images/redheart.png' if liked else 'images/coracao.png') }}"
+                    alt="Curtir" class="heart-icon">
+                </button>
+              </form>
+            </div>
+            {% endfor %}
             {% else %}
-              <p class="empty">Nenhum post ainda. Seja o primeiro a postar!</p>
+            <p class="empty">Nenhum post ainda. Seja o primeiro a postar!</p>
             {% endif %}
           </div>
         </div>
@@ -158,4 +166,5 @@
   </script>
   <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 </body>
+
 </html>

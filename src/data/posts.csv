@@ -1,2 +1,4 @@
 id,author_id,author_name,timestamp,content,likes,likes_by
 1,1,teste,2025-10-15 02:20:33,primeiro post,0,
+2,4,cuzao,2025-10-15 19:29:28,"eu gosto de pintos, pintos gradnes e enormes",0,
+3,4,cuzao,2025-10-15 20:26:52,sds,0,
