@@ -56,13 +56,13 @@ fluker/
 │   │   ├── posts.csv
 │   │   └── users.csv
 │   │
-│   ├── pages/                   # templates HTML (Jinja)
+│   ├── pages/                   
 │   │   ├── index.html
 │   │   ├── createaccount.html
 │   │   ├── feed.html
 │   │   └── recoverypassword.html
 │   │
-│   └── static/                  # arquivos estáticos servidos pelo Flask
+│   └── static/                  
 │       ├── css/
 │       │   ├── styleLogin.css
 │       │   ├── styleRecoverPassword.css
@@ -81,6 +81,7 @@ fluker/
 │           └── sino.png
 │
 └── .git/
+```
 
 ---
 
