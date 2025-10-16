@@ -42,6 +42,7 @@ Nosso foco está em **funcionalidades essenciais** de uma rede social, mas com *
 
 Organização do repositório:
 
+### Estrutura
 fluker/
 ├── app.py
 ├── README.md
