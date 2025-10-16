@@ -105,13 +105,33 @@ async function initChat() {
     await loadMessages(true);
   });
 
-  // Envio de mensagem (clique e Enter)
+  // Envio de mensagem (clique e Enter) com proteção contra spam
   const sendBtn = document.getElementById("chat-send");
   const input = document.getElementById("chat-input");
 
-  sendBtn?.addEventListener("click", sendMessage);
+  let lastSendAt = 0;
+  const GAP_MS = 1500;
+
+  function canSendNow() {
+    const now = Date.now();
+    if (now - lastSendAt < GAP_MS) return false;
+    lastSendAt = now;
+    return true;
+  }
+
+  // Clique no botão
+  sendBtn?.addEventListener("click", () => {
+    if (!canSendNow()) return;
+    sendMessage();
+  });
+
+  // Enter no input
   input?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!canSendNow()) return;
+      sendMessage();
+    }
   });
 }
 
