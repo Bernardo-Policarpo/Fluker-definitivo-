@@ -42,29 +42,45 @@ Nosso foco está em **funcionalidades essenciais** de uma rede social, mas com *
 
 Organização do repositório:
 
-### Estrutura
+###
 
+```text
 fluker/
 ├── app.py
 ├── README.md
 ├── requirements.txt
 ├── src/
-│ ├── data/
-│ │ ├── messages.csv
-│ │ ├── notifications.csv
-│ │ ├── posts.csv
-│ │ └── users.csv
-│ │
-│ └── pages/
-│ ├── index.html
-│ ├── createaccount.html
-│ ├── feed.html
-│ └── recoverypassword.html
+│   ├── data/
+│   │   ├── messages.csv
+│   │   ├── notifications.csv
+│   │   ├── posts.csv
+│   │   └── users.csv
+│   │
+│   ├── pages/                   # templates HTML (Jinja)
+│   │   ├── index.html
+│   │   ├── createaccount.html
+│   │   ├── feed.html
+│   │   └── recoverypassword.html
+│   │
+│   └── static/                  # arquivos estáticos servidos pelo Flask
+│       ├── css/
+│       │   ├── styleLogin.css
+│       │   ├── styleRecoverPassword.css
+│       │   └── styleFeed.css
+│       │
+│       ├── scripts/
+│       │   └── script.js
+│       │
+│       └── images/
+│           ├── coracao.png
+│           ├── logo.png
+│           ├── logo1.png
+│           ├── Logo-Fluker.png
+│           ├── perfil.jpg
+│           ├── redheart.png
+│           └── sino.png
 │
 └── .git/
-
-### 📁 `src/`
-Diretório que contém o **código-fonte** e os recursos principais do sistema.
 
 ---
 
