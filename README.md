@@ -112,20 +112,20 @@ Armazena todos os arquivos estáticos servidos pelo Flask (sem renderização Ji
 
 - 📁 `css/`
   - Folhas de estilo responsáveis pelo visual das páginas.
-  - `styleLogin.css`→estilos da tela de login
-  - `styleRecoverPassword.css`→estilos da tela de recuperação de senha
-  - `styleFeed.css`→estilos do feed de postagens
+  - `styleLogin.css` → estilos da tela de login
+  - `styleRecoverPassword.css` → estilos da tela de recuperação de senha
+  - `styleFeed.css` → estilos do feed de postagens
 
 - 📁 `scripts/`
   - JavaScript do cliente: interatividade, eventos e chamadas às APIs.
-  - `script.js`→inicializações gerais, handlers (curtir, etc.)
+  - `script.js` → inicializações gerais, handlers (curtir, etc.)
 
 - 📁 `images/`
   - Ícones e imagens da interface.
-  - `logo.png`, `Logo-Fluker.png`, `logo1.png`→variantes de logotipo
-  - `coracao.png`, `redheart.png`→ícones de curtida
-  - `sino.png`→ícone de notificação
-  - `perfil.jpg`→avatar padrão
+  - `logo.png`, `Logo-Fluker.png`, `logo1.png` → variantes de logotipo
+  - `coracao.png`, `redheart.png` → ícones de curtida
+  - `sino.png` → ícone de notificação
+  - `perfil.jpg` → avatar padrão
 
   ---
 
