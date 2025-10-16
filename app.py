@@ -224,14 +224,36 @@ def logout():
 def home_page():
     """Feed principal com todos os posts"""
     ensure_posts_csv()
-    
+
     # Carrega posts do CSV
     with open(POSTS_PATH, 'r', newline='', encoding='utf-8') as f:
         posts = list(csv.DictReader(f))
-    
+
+    # Função para converter timestamp UTC para horário de São Paulo
+    def to_sp_display(ts_str: str) -> str:
+        try:
+            # Se for ISO (com "T")
+            if 'T' in ts_str:
+                dt = datetime.fromisoformat(ts_str)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+            else:
+                # Formato antigo "YYYY-MM-DD HH:MM:SS" sem tz => considere UTC
+                dt = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+
+            # Converte para fuso de São Paulo
+            dt_sp = dt.astimezone(ZoneInfo("America/Sao_Paulo"))
+            return dt_sp.strftime("%d/%m/%Y %H:%M")
+        except Exception:
+            return ts_str
+
+    # Adiciona timestamp formatado em cada post
+    for p in posts:
+        p['timestamp_display'] = to_sp_display(p.get('timestamp', ''))
+
     # Ordena do mais recente pro mais antigo
     posts.sort(key=lambda x: int(x['id']), reverse=True)
-    
+
     return render_template(
         'feed.html',
         posts=posts,
