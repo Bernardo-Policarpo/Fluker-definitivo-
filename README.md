@@ -43,22 +43,23 @@ Nosso foco está em **funcionalidades essenciais** de uma rede social, mas com *
 Organização do repositório:
 
 ### Estrutura
+
 fluker/
 ├── app.py
 ├── README.md
 ├── requirements.txt
 ├── src/
-│   ├── data/
-│   │   ├── messages.csv
-│   │   ├── notifications.csv
-│   │   ├── posts.csv
-│   │   └── users.csv
-│   │
-│   └── pages/
-│       ├── index.html
-│       ├── createaccount.html
-│       ├── feed.html
-│       └── recoverypassword.html
+│ ├── data/
+│ │ ├── messages.csv
+│ │ ├── notifications.csv
+│ │ ├── posts.csv
+│ │ └── users.csv
+│ │
+│ └── pages/
+│ ├── index.html
+│ ├── createaccount.html
+│ ├── feed.html
+│ └── recoverypassword.html
 │
 └── .git/
 
