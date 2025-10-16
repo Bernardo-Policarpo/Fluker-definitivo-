@@ -1,4 +1,7 @@
-/* Cores personalizadas */
+/* ========================================
+   VARIÁVEIS GLOBAIS
+   ======================================== */
+/* Paleta e tokens de UI usados no app todo */
 :root {
   --cor-principal: #8b4dff;
   --cor-secundaria: #a166ff;
@@ -6,8 +9,22 @@
   --cor-texto: #000000;
   --cor-botao: #f3f3f3;
   --variacao: #c39eff;
+
+  /* Cores de mensagens do chat */
+  --chat-me-bg: #7a3fff;
+  --chat-me-bg-hover: #6f37f0;
+  --chat-me-text: #ffffff;
+  --chat-partner-bg: #efe6ff;
+  --chat-partner-bg-hover: #e6dbff;
+  --chat-partner-text: #2c2452;
+
+  /* Sombra padrão de bolha */
+  --chat-bubble-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
+/* ========================================
+   RESET E ESTILOS GLOBAIS
+   ======================================== */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
@@ -15,183 +32,17 @@ body {
   color: var(--cor-texto);
 }
 
-header {
-  background-color: var(--cor-principal);
-  color: white;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-}
+/* Utilitários rápidos */
+.hidden { display: none; }
 
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  height: 40px;
-  width: auto;
-}
-
-.title-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.user-icon {
-  background-color: white;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-}
-
-.user-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-.post-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-.layout {
-  display: flex;
-  height: calc(100vh - 60px);
-}
-
-.sidebar {
-  width: 220px;
-  background-color: var(--cor-secundaria);
-  color: white;
-  padding: 20px;
-  border-style: solid;
-  border-color: var(--cor-fundo);
-  border-width: 2px;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  margin: 15px 0;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-
-.sidebar li:hover {
-  background-color: #c9a8ff;
-  padding-left: 10px;
-}
-
-main {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.top-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.top-tabs button {
-  background-color: var(--cor-principal);
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.top-tabs button:hover {
-  background-color: var(--variacao);
-}
-
-.content {
-  display: none;
-}
-
-.content.active {
-  display: block;
-}
-
-.profile {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.avatar {
-  font-size: 50px;
-  margin-bottom: 10px;
-}
-
-.buttons button {
-  margin-right: 10px;
-  padding: 8px 12px;
-  background-color: var(--cor-botao);
-  color: var(--cor-texto);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.posts .post {
-  background-color: white;
-  margin: 10px 0;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px #ccc;
-}
-
-.stories {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.story {
-  background-color: #d1b3ff;
-  padding: 10px;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
+.empty {
+  color: #999;
+  font-style: italic;
+  margin-top: 20px;
   text-align: center;
-  line-height: 30px;
 }
 
-.video {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 0 5px #ccc;
-}
-
-.settings li {
-  background-color: #f5eaff;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 5px;
-}
-
+/* Inputs básicos */
 input[type="text"] {
   width: 100%;
   padding: 10px;
@@ -200,11 +51,346 @@ input[type="text"] {
   border: 1px solid #ccc;
 }
 
-.empty {
-  color: #999;
-  font-style: italic;
+/* ========================================
+   HEADER (CABEÇALHO)
+   ======================================== */
+header {
+  background-color: var(--cor-principal);
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative; /* permite centralizar o título absoluto */
 }
 
+.header-left { display: flex; align-items: center; }
+
+.logo { height: 40px; width: auto; }
+
+/* Botão central do título (fica absolutamente centralizado no header) */
+.title-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* ========================================
+   MENU DO USUÁRIO (SINO + PERFIL)
+   ======================================== */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 20px;
+}
+
+/* Wrapper do sino para posicionar o badge */
+.bell-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+}
+
+/* Ícone do sino */
+.bell-wrapper .icone-sino,
+.icone-sino {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+/* Badge de notificações não lidas (fica escondido quando sem .show) */
+.bell-wrapper .notif-badge,
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 999px;
+  background: #e02424;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px #fff;
+  pointer-events: none;
+  display: none;
+}
+.notif-badge.show { display: inline-block; }
+
+/* Avatar no topo com borda branca para destacar */
+.perfil-topo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+/* Dropdown do usuário */
+.menu-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #aaa;
+  z-index: 100;
+  width: 160px;
+}
+.menu-dropdown ul { list-style: none; margin: 0; padding: 10px 0; }
+.menu-dropdown li {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-weight: bold;
+  color: var(--cor-texto);
+}
+.menu-dropdown li:hover { background-color: var(--cor-fundo); }
+
+/* ========================================
+   MODAL DE NOTIFICAÇÕES
+   ======================================== */
+/* Contêiner do modal ocupa a tela toda */
+#notifications-modal { position: fixed; inset: 0; z-index: 1000; }
+
+/* Backdrop é transparente (padrão atual) */
+#notifications-modal-backdrop { position: absolute; inset: 0; background: transparent; }
+
+/* Caixa de conteúdo (card do modal) */
+#notifications-modal-content {
+  position: absolute;
+  top: 56px;
+  right: 16px;
+  min-width: 280px;
+  max-width: 360px;
+  max-height: 60vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 12px;
+}
+/* Triângulo indicando a origem do popover */
+#notifications-modal-content::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: var(--arrow-right, 20px);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #fff transparent;
+  filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.06));
+}
+
+/* Linhas de notificações */
+#notifications-list .notificacao {
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-size: 12px;
+}
+#notifications-list .notificacao:last-child { border-bottom: none; }
+
+/* Botões do modal */
+#mark-all-read { width: 100%; margin-top: 10px !important; }
+#notifications-modal-close { display: none !important; }
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+.layout { display: flex; height: calc(100vh - 60px); }
+main { flex: 1; padding: 20px; overflow-y: auto; }
+
+/* Abas de conteúdo: só uma ativa por vez */
+.content { display: none; }
+.content.active { display: block; }
+
+/* ========================================
+   PERFIL (aba perfil do HTML)
+   ======================================== */
+.profile {
+  background-color: #f5eaff;
+  padding: 20px;
+  border-radius: 10px;
+}
+.avatar { font-size: 50px; margin-bottom: 10px; }
+.perfil-principal {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+/* ========================================
+   FEED E POSTS
+   ======================================== */
+/* Container do feed (card grande) */
+.feed-container {
+  background-color: #f5eaff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+/* Form de novo post (efeito de foco suave) */
+.new-post-form {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  transition: box-shadow .2s ease, transform .05s ease;
+}
+.new-post-form:focus-within {
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+/* Textarea do novo post (com foco destacado) */
+.new-post-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  padding: 12px 14px;
+  overflow-x: hidden;
+  margin-bottom: 10px;   /* espaço do botão */
+  min-height: 84px;
+  resize: vertical;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  background: #faf9ff;
+  color: #222;
+  outline: none;
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.new-post-form textarea::placeholder { color: #999; }
+.new-post-form textarea:focus {
+  border-color: var(--cor-principal);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(139,77,255,0.15);
+}
+
+/* Botão "Publicar" primário */
+.new-post-form button[type="submit"] {
+  appearance: none;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  color: #ffffff;
+  background: var(--cor-principal);
+  box-shadow: 0 6px 14px rgba(84, 92, 245, 0.25);
+  transition: transform .04s ease, box-shadow .2s ease, filter .15s ease, background .2s ease;
+}
+.new-post-form button[type="submit"]:hover {
+  filter: brightness(1.04);
+  box-shadow: 0 8px 20px rgba(84, 92, 245, 0.35);
+}
+.new-post-form button[type="submit"]:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 14px rgba(84, 92, 245, 0.25);
+}
+.new-post-form button[type="submit"]:focus {
+  outline: 2px solid rgba(84, 92, 245, 0.35);
+  outline-offset: 2px;
+}
+.new-post-form button[type="submit"]:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Cartão de cada post */
+.posts .post {
+  background-color: white;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px #ccc;
+}
+
+/* Cabeçalho do post (avatar + nome + data) */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* Avatar do autor do post */
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Área de curtidas (ícone + contador) */
+.like-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Botão do coração (com animação leve no hover) */
+.heart-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+.heart-btn:hover { transform: scale(1.1); }
+
+/* Ícone do coração */
+.heart-icon {
+  width: 28px;
+  height: 28px;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+/* Efeito “clique” (caso seja usado via JS) */
+.heart-btn.clicked .heart-icon {
+  transform: scale(1.3);
+  filter: drop-shadow(0 0 6px red);
+}
+
+/* Contador de likes */
+.like-count {
+  font-size: 0.9rem;
+  color: var(--cor-texto);
+}
+
+/* ========================================
+   CHAT (DM)
+   ======================================== */
+/* Botão flutuante para abrir/fechar o chat */
 .chat-button {
   position: fixed;
   bottom: 20px;
@@ -216,617 +402,106 @@ input[type="text"] {
   border-radius: 30px;
   font-weight: bold;
   cursor: pointer;
-}
-.heart-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: transform 0.2s ease;
+  z-index: 1001;
 }
 
-.heart-btn:hover {
-  transform: scale(1.1);
-}
-
-.heart-icon {
-  width: 28px;
-  height: 28px;
-  transition: transform 0.15s ease, filter 0.15s ease;
-}
-
-.heart-btn.clicked .heart-icon {
-  transform: scale(1.3);
-  filter: drop-shadow(0 0 6px red);
-}
-
-.feed-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 850px;
-  margin: 0 auto;
-}
-
-.stories {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.story {
-  background-color: #d1b3ff;
-  padding: 10px;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  line-height: 30px;
-}
-
-.posts .post {
-  background-color: white;
-  margin: 10px 0;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px #ccc;
-}
-
-@media (max-width: 768px) {
-  * {
-    box-sizing: border-box;
-  }
-
-  .layout {
-    flex-direction: column;
-    height: auto;
-  }
-
-  main {
-    padding: 10px;
-  }
-
-  .sidebar {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    padding: 10px;
-    font-size: 14px;
-    border: none;
-    border-bottom: 2px solid var(--cor-fundo);
-  }
-
-  .sidebar li {
-    flex: 1 1 45%;
-    margin: 5px;
-    padding: 8px;
-    text-align: center;
-    background-color: var(--cor-secundaria);
-    border-radius: 5px;
-  }
-
-  .top-tabs {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .post-content {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .post-main {
-    width: 100%;
-  }
-
-  .post-side {
-    width: 100%;
-    max-height: none;
-    margin-top: 10px;
-  }
-
-  .story {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .chat-button {
-    bottom: 10px;
-    right: 10px;
-    padding: 10px 16px;
-    font-size: 14px;
-  }
-
-  .user-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 28px;
-    padding: 8px;
-  }
-
-  .logo {
-    height: 30px;
-  }
-
-  .title-center {
-    font-size: 20px;
-  }
-}
-
-
-.notificacoes-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.notificacao {
-  background-color: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px #ccc;
-}
-
-.notificacao p {
-  margin: 0;
-  font-size: 16px;
-  color: var(--cor-texto);
-}
-
-.empty {
-  margin-top: 20px;
-  font-style: italic;
-  color: #888;
-  text-align: center;
-}
-
-.mensagens-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.mensagem {
-  background-color: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px #ccc;
-}
-
-.mensagem p {
-  margin: 0;
-  font-size: 16px;
-  color: var(--cor-texto);
-}
-
-.video-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-.video-thumbnail {
-  background-color: white;
-  padding: 30px 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 5px #ccc;
-  position: relative;
-}
-
-.play-button {
-  font-size: 40px;
-  color: var(--cor-principal);
-  margin-bottom: 10px;
-}
-
-.video-thumbnail h2 {
-  margin: 0;
-  font-size: 18px;
-  color: var(--cor-texto);
-}
-
-.video-info {
-  margin-top: 15px;
-  font-size: 14px;
-  color: #333;
-}
-
-.video-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-}
-
-.video-actions .action {
-  font-size: 24px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.video-actions .action:hover {
-  transform: scale(1.2);
-}
-
-.explorar-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.search-bar {
-  margin-bottom: 20px;
-}
-
-.search-bar input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
-
-.explorar-item {
-  background-color: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px #ccc;
-}
-
-.explorar-item p {
-  margin: 0;
-  font-size: 16px;
-  color: var(--cor-texto);
-}
-
-.configuracoes-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.config-item {
-  background-color: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px #ccc;
-}
-
-.config-item p {
-  margin: 0;
-  font-size: 16px;
-  color: var(--cor-texto);
-}
-
+/* Janela do chat (tamanho fixo controlado) */
 .chat-box {
   position: fixed;
-  bottom: 80px;
   right: 20px;
-  width: 300px;
-  background-color: #e9d8ff;
-  border-radius: 15px;
-  box-shadow: 0 0 10px #aaa;
-  overflow: hidden;
+  bottom: 70px;
+  width: 320px;          /* largura fixa */
+  height: 290px;         /* altura fixa (ajuste conforme preferir) */
   display: flex;
   flex-direction: column;
-  z-index: 1000;
-}
-
-.chat-box.hidden {
-  display: none;
-}
-
-.chat-header {
-  background-color: #8b4dff;
-  color: white;
-  padding: 12px;
-  font-weight: bold;
-  text-align: center;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-}
-
-.chat-body {
-  flex: 1;
-  padding: 20px;
-  background-color: #f5eaff;
-  font-size: 14px;
-  min-height: 150px;
-}
-
-.chat-footer {
-  background-color: #d1b3ff;
-  padding: 12px;
-  text-align: center;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
-}
-
-.perfil-topo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.perfil-principal {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
-}
-
-.story-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.post-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.post-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.post-actions {
-  margin-top: 15px;
-  display: flex;
-  gap: 10px;
-}
-
-.post-actions button {
-  background-color: #8b4dff;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.post-actions button:hover {
-  background-color: #6a3acb;
-}
-
-.comentarios {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid #ddd;
-  font-size: 14px;
-  color: #333;
-}
-
-.comentarios p {
-  margin: 5px 0;
-}
-
-.comentarios {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid #ddd;
-  font-size: 14px;
-  color: #333;
-}
-
-.comentario {
-  margin-bottom: 10px;
-  background-color: #f5f5ff;
-  padding: 8px;
-  border-radius: 5px;
-}
-
-.comentario-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 5px;
-}
-
-.comentario-actions button {
-  background-color: #d1b3ff;
-  border: none;
-  padding: 5px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.comentario-actions button:hover {
-  background-color: #c09eff;
-}
-
-.resposta {
-  margin-left: 20px;
-  font-size: 13px;
-  color: #555;
-}
-
-.post-content {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.post-main {
-  flex: 1;
-}
-
-.post-side {
-  width: 250px;
-  background-color: #f5f5ff;
-  border-radius: 10px;
-  padding: 10px;
-  overflow-y: auto;
-  max-height: 300px;
-}
-
-.comentarios-laterais h4 {
-  margin-top: 0;
-  font-size: 16px;
-  color: #6a3acb;
-}
-
-.comentario {
-  background-color: #fff;
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 3px #ccc;
-}
-
-.comentario-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 5px;
-}
-
-.comentario-actions button {
-  background-color: #d1b3ff;
-  border: none;
-  padding: 4px 6px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.comentario-actions button:hover {
-  background-color: #c09eff;
-}
-
-.resposta {
-  margin-left: 15px;
-  font-size: 13px;
-  color: #555;
-}
-
-.post-content {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.post-main {
-  flex: 1 1 60%;
-  min-width: 250px;
-}
-
-.post-side {
-  flex: 0 0 250px;
-}
-
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: 12px; /* Espaço entre sino e perfil */
-  margin-right: 20px;
-}
-
-.icone-sino {
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid white;
-}
-
-.perfil-topo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-  border: 2px solid white;
-}
-
-.menu-dropdown {
-  position: absolute;
-  top: 60px;
-  right: 0;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px #aaa;
-  z-index: 100;
-  width: 160px;
-}
-
-.menu-dropdown ul {
-  list-style: none;
-  margin: 0;
-  padding: 10px 0;
-}
-
-.menu-dropdown li {
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background 0.2s;
-  font-weight: bold;
-  color: var(--cor-texto);
-}
-
-.menu-dropdown li:hover {
-  background-color: var(--cor-fundo);
-}
-
-.hidden {
-  display: none;
-}
-
-
-/* SEPARAMODAL */
-.chat-box {
-  position: fixed; right: 20px; bottom: 70px;
-  width: 320px; max-height: 60vh; display: flex; flex-direction: column;
-  border: 1px solid #ccc; border-radius: 20px; background: #11111100; color: #eee;
-  box-shadow: 0 8px 24px rgba(0,0,0,.3); overflow: hidden;
-  z-index: 999; /* Garante que o modal fique acima de outros elementos, mas abaixo do botão */
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background: #11111100;
+  color: #eee;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  overflow: hidden;      /* impede expansão externa */
+  z-index: 999;
 }
 .chat-box.hidden { display: none; }
 
+/* Cabeçalho do chat (título + fechar) */
 .chat-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 10px; background: var(--cor-principal); border-bottom: 1px solid var(--variacao);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: var(--cor-principal);
+  border-bottom: 1px solid var(--variacao);
 }
-.chat-close { background: transparent; color: #eee; border: 0; font-size: 18px; cursor: pointer; }
 
+/* Botão fechar (X) do chat */
+.chat-close {
+  background: transparent;
+  color: #eee;
+  border: 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Corpo do chat (lista de mensagens) */
 .chat-body {
-  flex: 1; overflow-y: auto; padding: 8px; font-family: monospace; font-size: 13px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 13px;
   background: var(--cor-fundo);
 }
+
+/* Linhas de mensagem (diferencio eu/parceiro por cor e alinhamento) */
 .msg-line { margin: 4px 0; }
-.msg-me { color: var(--cor-principal); text-align: right; } /* Mensagens do próprio usuário */
-.msg-partner { color: var(--cor-secundaria); text-align: left; } /* Mensagens do parceiro */
+.msg-me { color: var(--chat-me-bg); text-align: right; }
+.msg-partner { color: var(--chat-partner-text); text-align: left; }
 
+/* Rodapé do chat (input + enviar) */
 .chat-footer {
-  display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--variacao); background: var(--cor-secundaria);
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  border-top: 1px solid var(--variacao);
+  background: var(--cor-secundaria);
 }
-.chat-footer input::placeholder {
-  color: white; /* ou qualquer cor desejada */
-  opacity: 0.6;            /* deixa o texto mais suave */
-  font-style: italic;      /* opcional, para dar um toque visual */
+.chat-footer input {
+  flex: 1;
+  padding: 6px 8px;
+  background: var(--cor-principal);
+  color: white;
+  border: 1px solid var(--variacao);
+  border-radius: 6px;
+}
+.chat-footer input::placeholder { color: white; opacity: 0.6; font-style: italic; }
+.chat-footer button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--variacao);
+  background: var(--cor-principal);
+  color: #eee;
+  cursor: pointer;
 }
 
-.chat-footer input { flex: 1; padding: 6px 8px; background: var(--cor-principal); color: white; border: 1px solid var(--variacao); border-radius: 6px; }
-.chat-footer button { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--variacao); background: var(--cor-principal); color: #eee; cursor: pointer; }
-/* SEPARAMODAL */
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+@media (max-width: 768px) {
+  * { box-sizing: border-box; }
+  .layout { flex-direction: column; height: auto; }
+  main { padding: 10px; }
+
+  /* Botão do chat mais compacto no mobile */
+  .chat-button { bottom: 10px; right: 10px; padding: 10px 16px; font-size: 14px; }
+
+  /* Header mais contido */
+  .logo { height: 30px; }
+  .title-center { font-size: 20px; }
+
+  /* Cards com menos respiro */
+  .new-post-form { padding: 12px; }
+}
+@media (max-width: 540px) {
+  .new-post-form { padding: 12px; }
+}

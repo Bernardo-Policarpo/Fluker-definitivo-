@@ -5,145 +5,163 @@
 
 /* ====== RESET ====== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
 /* ====== BODY ====== */
 body {
-    background-color: #e9d8ff; /* lilás claro */
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: #e9d8ff; /* lilás claro */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ====== CONTAINER PRINCIPAL ====== */
 .corpo {
-    text-align: center;
-    width: 100%;
-    max-width: 350px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;   /* consolidado com a regra inferior */
+  max-height: 400px;  /* consolidado com a regra inferior */
 }
 
 /* ====== CABEÇALHO ====== */
 #NomeFluker {
-    font-family: "Lilita One", cursive;
-    font-size: 2.8rem;
-    color: #8b4dff; /* lilás mais forte */
-    margin-bottom: 1.5rem;
-    letter-spacing: 1px;
+  font-family: "Lilita One", cursive;
+  font-size: 2.8rem;
+  color: #8b4dff; /* lilás mais forte */
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
 }
 
 /* ====== FORMULÁRIO ====== */
 .login {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 form {
-    width: 80%;
+  width: 80%;
 }
 
 /* ====== LABELS ====== */
 #userTitle,
-#passwordTitle {
-    font-size: 1.2rem;
-    font-weight: 100;
-    color: #8b4dff;
-    margin-bottom: 5px;
+#passwordTitle,
+#emailTitle {
+  font-size: 1.2rem;
+  font-weight: 100;
+  color: #8b4dff;
+  margin-bottom: 5px;
 }
 
 /* ====== INPUTS ====== */
-#enterUser{
-    height: 30px;
-    width: 90%;
-    padding: 10px 15px;
-    border: 2px solid #b58dff;
-    background-color: white;
-    outline: none;
-    color: #431381;
-    font-size: 1rem;
-    margin-bottom: 20px;
-    transition: 0.3s;
-    text-align: center;
+/* Campo de usuário (login) e também usado em cadastro */
+#enterUser {
+  height: 30px;
+  width: 90%;
+  padding: 10px 15px;
+  border: 2px solid #b58dff;
+  background-color: white;
+  outline: none;
+  color: #431381;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  transition: 0.3s;
+  text-align: center;
 }
 
+/* Campo de senha (login) */
 #enterPassword {
-    height: 30px;
-    width: 90%;
-    padding: 10px 15px;
-    border: 2px solid #b58dff;
-    background-color: white;
-    outline: none;
-    color: #431381;
-    font-size: 1rem;
-    margin-bottom: 20px;
-    transition: 0.3s;
-    text-align: center;
+  height: 30px;
+  width: 90%;
+  padding: 10px 15px;
+  border: 2px solid #b58dff;
+  background-color: white;
+  outline: none;
+  color: #431381;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  transition: 0.3s;
+  text-align: center;
+}
+
+/* Campo de e-mail (página de recuperação e cadastro) */
+#enterEmail {
+  height: 30px;
+  width: 90%;
+  padding: 10px 15px;
+  border: 2px solid #b58dff;
+  background-color: white;
+  outline: none;
+  color: #431381;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  transition: 0.3s;
+  text-align: center;
 }
 
 #enterUser:focus,
-#enterPassword:focus {
-    border-color: #8b4dff;
+#enterPassword:focus,
+#enterEmail:focus {
+  border-color: #8b4dff;
 }
 
-/* ====== BOTÃO ENTRAR ====== */
-#loginButton {
-    height: 45px;
-    width: 90%;
-    background-color: #a166ff;
-    color: #fff;
-    font-weight: 700;
-    border: none;
-    border-radius: 25px;
-    padding: 5px 0;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s;
+/* ====== BOTÃO ENTRAR/ENVIAR ====== */
+#loginButton,
+#recoverButton {
+  height: 45px;
+  width: 90%;
+  background-color: #a166ff;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 25px;
+  padding: 5px 0;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
 }
 
-#loginButton:hover {
-    background-color: #8b4dff;
+#loginButton:hover,
+#recoverButton:hover {
+  background-color: #8b4dff;
 }
 
 /* ====== LINKS ====== */
 .createAccount {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
 }
 
 #criarConta,
 #esqueciMinhaSenha {
-    background: none;
-    border: none;
-    color: #8b4dff;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: 0.3s;
+  background: none;
+  border: none;
+  color: #8b4dff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: 0.3s;
 }
 
 #criarConta:hover,
 #esqueciMinhaSenha:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 /* ====== RESPONSIVIDADE ====== */
 @media (max-width: 480px) {
-    #NomeFluker {
-        font-size: 2.5rem;
-    }
+  #NomeFluker {
+    font-size: 2.5rem;
+  }
 
-    #loginButton {
-        font-size: 0.9rem;
-    }
-}
-
-.corpo {
-    max-width: 400px;
-    max-height: 400px;
+  #loginButton,
+  #recoverButton {
+    font-size: 0.9rem;
+  }
 }

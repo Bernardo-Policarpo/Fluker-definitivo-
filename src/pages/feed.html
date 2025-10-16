@@ -7,20 +7,26 @@
   <title>FLUKER</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/Logo-Fluker.png') }}" type="image/x-icon">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleFeed.css') }}">
-
 </head>
 
 <body>
+  <!-- Cabeçalho principal: logo, título e menu do usuário -->
   <header>
     <div class="header-left">
       <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo FLUKER" class="logo" />
       <button class="title-center" onclick="showSection('inicio')">FLUKER</button>
     </div>
+
     <div class="user-menu">
-      <img src="{{ url_for('static', filename='images/sino.png') }}" alt="Notificações" class="icone-sino"
-        onclick="showSection('notificacoes')">
+      <!-- Sino de notificações com badge de não lidas -->
+      <div class="bell-wrapper" onclick="openNotificationsModal()">
+        <img src="{{ url_for('static', filename='images/sino.png') }}" alt="Notificações" class="icone-sino">
+        <span id="notif-badge" class="notif-badge"></span>
+      </div>
+
+      <!-- Avatar do usuário com dropdown -->
       <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Perfil" class="perfil-topo"
-        onclick="toggleUserMenu()" />
+           onclick="toggleUserMenu()" />
       <div class="menu-dropdown hidden" id="user-dropdown">
         <ul>
           <li onclick="showSection('perfil')">Perfil</li>
@@ -32,11 +38,12 @@
 
   <div class="layout">
     <main>
+      <!-- Seção de perfil (ainda em construção) -->
       <section id="perfil" class="content">
         <div class="profile">
           <div class="avatar">
             <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil"
-              class="perfil-principal" />
+                 class="perfil-principal" />
           </div>
           <div class="posts">
             <div class="post">Post 1</div>
@@ -46,10 +53,10 @@
         </div>
       </section>
 
+      <!-- Feed principal: formulário de novo post + lista de posts -->
       <section id="inicio" class="content active">
         <div class="feed-container">
-
-          <!-- Novo post: envia para a rota /postar (POST) que grava no CSV e redireciona -->
+          <!-- Form de novo post: envia para /postar (POST) -->
           <form action="{{ url_for('postar') }}" method="POST" class="new-post-form">
             <textarea name="content" rows="3" placeholder="Escreva um post..." required></textarea>
             <div>
@@ -57,67 +64,46 @@
             </div>
           </form>
 
-          <!-- Lista de posts carregados do backend (app.py -> home_page) -->
+          <!-- Lista de posts vinda do backend -->
           <div class="posts">
             {% if posts %}
-            {% for p in posts %}
-            <div class="post">
-              <div class="post-header">
-                <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="{{ p.author_name }}"
-                  class="post-avatar" />
-                <div>
-                  <h3>{{ p.author_name }}</h3>
-                  <small>{{ p.timestamp }}</small>
+              {% for p in posts %}
+                <div class="post">
+                  <!-- Cabeçalho do post: avatar, nome e timestamp -->
+                  <div class="post-header">
+                    <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="{{ p.author_name }}"
+                         class="post-avatar" />
+                    <div>
+                      <h3>{{ p.author_name }}</h3>
+                      <small>{{ p.timestamp }}</small>
+                    </div>
+                  </div>
+
+                  <!-- Conteúdo do post -->
+                  <p>{{ p.content }}</p>
+
+                  <!-- Verifica se o usuário atual já curtiu este post -->
+                  {% set liked = (p.get('likes_by') or '') and (user_id in (p.get('likes_by').split(';'))) %}
+
+                  <!-- Botão de curtir: chama toggleCurtida() que faz POST em /curtir/<id> -->
+                  <form action="{{ url_for('curtir', post_id=p.id) }}" method="POST" id="form-like-{{ p.id }}" class="like-form">
+                    <button type="button" class="heart-btn" onclick="toggleCurtida(this)">
+                      <img src="{{ url_for('static', filename='images/redheart.png' if liked else 'images/coracao.png') }}"
+                           alt="Curtir" class="heart-icon">
+                    </button>
+                    <span class="like-count">{{ p.likes or 0 }}</span>
+                  </form>
                 </div>
-              </div>
-
-              <!-- Conteúdo do post vem direto do CSV -->
-              <p>{{ p.content }}</p>
-
-              {# liked: true/false se o ID do usuário atual já está na lista de curtidas do post #}
-              {% set liked = (p.get('likes_by') or '') and (user_id in (p.get('likes_by').split(';'))) %}
-
-              <!-- Botão de curtir faz POST na rota /curtir/<id> que alterna like/unlike no CSV -->
-              <form action="{{ url_for('curtir', post_id=p.id) }}" method="POST" id="form-like-{{ p.id }}">
-                <button type="button" class="heart-btn" onclick="toggleCurtida(this)">
-                  <img src="{{ url_for('static', filename='images/redheart.png' if liked else 'images/coracao.png') }}"
-                    alt="Curtir" class="heart-icon">
-                </button>
-              </form>
-            </div>
-            {% endfor %}
+              {% endfor %}
             {% else %}
-            <p class="empty">Nenhum post ainda. Seja o primeiro a postar!</p>
+              <p class="empty">Nenhum post ainda. Seja o primeiro a postar!</p>
             {% endif %}
           </div>
         </div>
       </section>
 
-      <section id="notificacoes" class="content">
-        <div class="notificacoes-container">
-          <div class="notificacao">
-            <p><strong>Bernardo-Policarpo</strong> curtiu seu post ❤️</p>
-          </div>
-          <div class="notificacao">
-            <p><strong>Lucas, Gabrieli</strong> curtiu seu post ❤️</p>
-          </div>
-          <p class="empty">Não há mais notificações!</p>
-        </div>
-      </section>
-
-      <section id="mensagens" class="content">
-        <div class="mensagens-container">
-          <div class="mensagem">
-            <p><strong>Bernardo-Policarpo</strong><br> curtiu seu post </p>
-          </div>
-          <div class="mensagem">
-            <p><strong>Lucas, Gabrieli</strong><br> curtiu seu post </p>
-          </div>
-          <p class="empty">Não há mais mensagens!</p>
-        </div>
-      </section>
-
-      <!--<section id="configuracoes" class="content">
+      <!-- Seção de configurações (comentada por enquanto)
+      <section id="configuracoes" class="content">
         <div class="configuracoes-container">
           <div class="config-item">
             <p><strong>Privacidade e Visibilidade</strong></p>
@@ -132,11 +118,12 @@
             <p><strong>Bloqueios e Moderação</strong></p>
           </div>
         </div>
-      </section>-->
+      </section>
+      -->
     </main>
   </div>
 
-  <!-- Botão flutuante para abrir/fechar o chat -->
+  <!-- Botão flutuante para abrir/fechar o chat DM -->
   <button class="chat-button" onclick="toggleChat()">CHAT</button>
 
   <!-- Caixa de chat (DM) -->
@@ -144,27 +131,39 @@
     <div class="chat-header">
       <div style="display:flex; align-items:center; gap:8px;">
         <strong>DM</strong>
-        <!-- Select preenchido via /api/users com todos menos o usuário atual -->
+        <!-- Select de usuários disponíveis (carregado via /api/users) -->
         <select id="chat-partner" title="Selecionar usuário"></select>
       </div>
       <button class="chat-close" onclick="toggleChat()">×</button>
     </div>
 
-    <!-- Mensagens do chat são carregadas via /api/messages (polling) -->
+    <!-- Área de mensagens (carregadas via /api/messages com polling) -->
     <div id="chat-messages" class="chat-body"></div>
 
-    <!-- Envio de mensagens chama /api/send (POST JSON) -->
+    <!-- Input e botão de envio (chama /api/send via POST JSON) -->
     <div class="chat-footer">
       <input id="chat-input" type="text" placeholder="Digite sua mensagem..." />
       <button id="chat-send">Enviar</button>
     </div>
   </div>
 
-  <!-- Exponho o ID do usuário atual para o script controlar "eu" vs "outro" nas DMs -->
+  <!-- Modal de notificações -->
+  <div id="notifications-modal" class="hidden">
+    <div id="notifications-modal-backdrop"></div>
+    <div id="notifications-modal-content" role="dialog" aria-modal="true" aria-labelledby="notifications-modal-title">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <h3 id="notifications-modal-title">Notificações</h3>
+        <button id="notifications-modal-close" aria-label="Fechar">×</button>
+      </div>
+      <div id="notifications-list"></div>
+      <button id="mark-all-read" style="margin-top:8px;">Marcar todas como lidas</button>
+    </div>
+  </div>
+
+  <!-- Exponho o ID do usuário atual para o JS saber quem é "eu" nas mensagens -->
   <script>
     window.CURRENT_USER_ID = "{{ session.get('user_id') }}";
   </script>
   <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 </body>
-
 </html>
