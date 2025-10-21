@@ -7,6 +7,11 @@
   <title>FLUKER</title>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/Logo-Fluker.png') }}" type="image/x-icon">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/styleFeed.css') }}">
+  <!-- React 18 via CDN (DEV) -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<!-- Babel para permitir JSX inline (apenas em desenvolvimento) -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 
 <body>
@@ -86,13 +91,12 @@
                   {% set liked = (p.get('likes_by') or '') and (user_id in (p.get('likes_by').split(';'))) %}
 
                   <!-- Botão de curtir: chama toggleCurtida() que faz POST em /curtir/<id> -->
-                  <form action="{{ url_for('curtir', post_id=p.id) }}" method="POST" id="form-like-{{ p.id }}" class="like-form">
-                    <button type="button" class="heart-btn" onclick="toggleCurtida(this)">
-                      <img src="{{ url_for('static', filename='images/redheart.png' if liked else 'images/coracao.png') }}"
-                           alt="Curtir" class="heart-icon">
-                    </button>
-                    <span class="like-count">{{ p.likes or 0 }}</span>
-                  </form>
+                  <div
+                   class="like-widget-root"
+                   data-post-id="{{ p.id }}"
+                   data-initial-likes="{{ p.likes or 0 }}"
+                   data-liked="{{ 'true' if liked else 'false' }}"
+                  ></div>
                 </div>
               {% endfor %}
             {% else %}
@@ -128,24 +132,8 @@
 
   <!-- Caixa de chat (DM) -->
   <div id="chat-box" class="chat-box hidden">
-    <div class="chat-header">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <strong>DM</strong>
-        <!-- Select de usuários disponíveis (carregado via /api/users) -->
-        <select id="chat-partner" title="Selecionar usuário"></select>
-      </div>
-      <button class="chat-close" onclick="toggleChat()">×</button>
-    </div>
-
-    <!-- Área de mensagens (carregadas via /api/messages com polling) -->
-    <div id="chat-messages" class="chat-body"></div>
-
-    <!-- Input e botão de envio (chama /api/send via POST JSON) -->
-    <div class="chat-footer">
-      <input id="chat-input" type="text" placeholder="Digite sua mensagem..." />
-      <button id="chat-send">Enviar</button>
-    </div>
-  </div>
+  <div id="dm-chat-root" data-current-user-id="{{ session.get('user_id') }}"></div>
+</div>
 
   <!-- Modal de notificações -->
   <div id="notifications-modal" class="hidden">
