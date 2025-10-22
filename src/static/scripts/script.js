@@ -639,3 +639,178 @@ function escapeHtml(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+/* ========================================
+   EXPLORAÇÃO DE USUÁRIOS - BUSCA
+======================================== */
+
+// Variável para controlar o debounce da busca
+let searchTimeout = null;
+
+/**
+ * Inicializa a funcionalidade de busca de usuários
+ * Chame esta função no DOMContentLoaded
+ */
+function initUserSearch() {
+  const searchInput = document.getElementById('user-search-input');
+  const resultsContainer = document.getElementById('search-results');
+  
+  if (!searchInput || !resultsContainer) return;
+  
+  // Evento de input com debounce
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.trim();
+    
+    // Limpa o timeout anterior
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    // Se o campo está vazio, esconde os resultados
+    if (query.length === 0) {
+      resultsContainer.classList.add('hidden');
+      resultsContainer.innerHTML = '';
+      return;
+    }
+    
+    // Mostra loading
+    resultsContainer.classList.remove('hidden');
+    resultsContainer.innerHTML = '<div class="search-loading">Buscando...</div>';
+    
+    // Busca com delay de 300ms
+    searchTimeout = setTimeout(() => {
+      searchUsers(query);
+    }, 300);
+  });
+  
+  // Fecha os resultados ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-box')) {
+      resultsContainer.classList.add('hidden');
+    }
+  });
+  
+  // Reabre resultados ao focar no input (se houver resultados)
+  searchInput.addEventListener('focus', () => {
+    if (resultsContainer.innerHTML && searchInput.value.trim()) {
+      resultsContainer.classList.remove('hidden');
+    }
+  });
+}
+
+/**
+ * Busca usuários na API
+ * @param {string} query - Termo de busca
+ */
+async function searchUsers(query) {
+  const resultsContainer = document.getElementById('search-results');
+  if (!resultsContainer) return;
+
+  try {
+    const response = await fetch('/api/users');
+    if (!response.ok) throw new Error('Erro ao buscar usuários');
+
+    const data = await response.json();
+    const allUsers = data.users || [];
+
+    // Filtra os usuários cujo username contém o termo buscado
+    const filtered = allUsers.filter(user =>
+      user.username.toLowerCase().includes(query.toLowerCase())
+    );
+
+    renderSearchResults(filtered);
+
+  } catch (error) {
+    console.error('Erro na busca de usuários:', error);
+    resultsContainer.innerHTML = '<div class="no-results">Erro ao buscar usuários. Tente novamente.</div>';
+  }
+}
+
+
+/**
+ * Renderiza os resultados da busca
+ * @param {Array} users - Lista de usuários encontrados
+ */
+function renderSearchResults(users) {
+  const resultsContainer = document.getElementById('search-results');
+  if (!resultsContainer) return;
+  
+  // Se não encontrou ninguém
+  if (users.length === 0) {
+    resultsContainer.innerHTML = '<div class="no-results">Nenhum usuário encontrado</div>';
+    return;
+  }
+  
+  // Limpa o container
+  resultsContainer.innerHTML = '';
+  
+  // Renderiza cada usuário
+  users.forEach(user => {
+    const userItem = createUserResultItem(user);
+    resultsContainer.appendChild(userItem);
+  });
+}
+
+/**
+ * Cria um elemento HTML para um usuário nos resultados
+ * @param {Object} user - Dados do usuário
+ * @returns {HTMLElement}
+ */
+function createUserResultItem(user) {
+  const item = document.createElement('div');
+  item.className = 'user-result-item';
+
+  item.innerHTML = `
+    <div class="user-result-info">
+      <div class="user-result-name">@${escapeHtml(user.username)}</div>
+    </div>
+  `;
+
+  item.addEventListener('click', () => {
+    goToUserProfile(user.id);
+  });
+
+  return item;
+}
+
+
+/**
+ * Navega para o perfil de um usuário
+ * @param {number} userId - ID do usuáriopython app.py
+ * 
+ */
+function goToUserProfile(userId) {
+  // Redireciona para a página de perfil do usuário
+  // Ajuste a rota conforme seu backend
+  window.location.href = `/perfil/${userId}`;
+}
+
+function openUserSearchModal() {
+  const modal = document.getElementById("user-search-modal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  initUserSearch();
+  document.getElementById("user-search-close")?.focus();
+}
+
+function closeUserSearchModal() {
+  const modal = document.getElementById("user-search-modal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const closeBtn = document.getElementById("user-search-close");
+  const backdrop = document.getElementById("user-search-backdrop");
+  const content = document.getElementById("user-search-content");
+
+  closeBtn?.addEventListener("click", closeUserSearchModal);
+  backdrop?.addEventListener("click", closeUserSearchModal);
+  content?.addEventListener("click", (e) => e.stopPropagation());
+
+  document.addEventListener("keydown", (e) => {
+    const modal = document.getElementById("user-search-modal");
+    const isOpen = modal && !modal.classList.contains("hidden");
+    if (isOpen && e.key === "Escape") closeUserSearchModal();
+  });
+});
