@@ -100,17 +100,8 @@
         <section id="inicio" class="content active">
           <div class="feed-container">
             <!-- Form de novo post: envia para /postar (POST) -->
-            <form
-              action="{{ url_for('postar') }}"
-              method="POST"
-              class="new-post-form"
-            >
-              <textarea
-                name="content"
-                rows="3"
-                placeholder="Escreva um post..."
-                required
-              ></textarea>
+            <form action="{{ url_for('postar') }}" method="POST" class="new-post-form">
+              <textarea name="content" rows="3" placeholder="Escreva um post..." required></textarea>
               <div>
                 <button type="submit">Publicar</button>
               </div>
