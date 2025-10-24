@@ -261,6 +261,13 @@ def home_page():
         user_id=str(session.get('user_id'))
     )
 
+@app.get('/perfil')
+def perfil():
+    """Exibe a página de perfil do usuário."""
+
+    return render_template('perfil.html')
+
+
 @app.get('/inbox')
 @login_required
 def inbox():
