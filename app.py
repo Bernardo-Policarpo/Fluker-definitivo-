@@ -31,6 +31,7 @@ CSV_PATH = os.path.join(DATA_DIR, 'users.csv')
 MESSAGES_PATH = os.path.join(DATA_DIR, 'messages.csv')
 POSTS_PATH = os.path.join(DATA_DIR, 'posts.csv')
 NOTIF_PATH = os.path.join(DATA_DIR, 'notifications.csv')
+FRIENDS_PATH = os.path.join(DATA_DIR, 'friends.csv')
 
 # ========================================
 # CONFIGURAÇÃO DO FLASK
@@ -68,6 +69,13 @@ def ensure_notifications_csv():
     if not os.path.exists(NOTIF_PATH):
         with open(NOTIF_PATH, 'w', newline='', encoding='utf-8') as f:
             csv.writer(f).writerow(['id', 'user_id', 'type', 'actor_id', 'message_id', 'timestamp', 'read', 'text'])
+
+def ensure_friends_csv():
+    """Cria o CSV de amizades se não existir"""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if not os.path.exists(FRIENDS_PATH):
+        with open(FRIENDS_PATH, 'w', newline='', encoding='utf-8') as f:
+            csv.writer(f).writerow(['user1_id', 'user2_id', 'status', 'timestamp'])
 
 # ========================================
 # GERADORES DE ID
@@ -130,6 +138,174 @@ def user_exists(user_id):
             if r.get('id') == str(user_id):
                 return True
     return False
+
+def get_user_by_id(user_id):
+    """Busca usuário por ID"""
+    ensure_csv()
+    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for r in reader:
+            if r.get('id') == str(user_id):
+                return {
+                    'id': r['id'],
+                    'username': r['username'],
+                    'email': r['email']
+                }
+    return None
+
+# ========================================
+# FUNÇÕES AUXILIARES
+# ========================================
+def format_timestamp(ts_str):
+    """Formata timestamp para exibição amigável"""
+    try:
+        if 'T' in ts_str:
+            dt = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+        else:
+            dt = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S")
+        return dt.strftime("%d/%m/%Y %H:%M")
+    except:
+        return ts_str
+
+# ========================================
+# SISTEMA DE AMIZADES
+# ========================================
+def get_friends(user_id):
+    """Retorna lista de amigos mútuos do usuário"""
+    ensure_friends_csv()
+    friends = []
+    user_id_str = str(user_id)
+    
+    with open(FRIENDS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if (row['user1_id'] == user_id_str and row['user2_id'] != user_id_str and row['status'] == 'accepted'):
+                friends.append(row['user2_id'])
+            elif (row['user2_id'] == user_id_str and row['user1_id'] != user_id_str and row['status'] == 'accepted'):
+                friends.append(row['user1_id'])
+    
+    return friends
+
+def get_friend_requests(user_id):
+    """Retorna solicitações de amizade pendentes para o usuário"""
+    ensure_friends_csv()
+    requests = []
+    user_id_str = str(user_id)
+    
+    with open(FRIENDS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if (row['user2_id'] == user_id_str and row['status'] == 'pending'):
+                requests.append({
+                    'user_id': row['user1_id'],
+                    'username': get_user_by_id(row['user1_id'])['username'],
+                    'timestamp': row['timestamp']
+                })
+    
+    return requests
+
+def are_friends(user1_id, user2_id):
+    """Verifica se dois usuários são amigos mútuos"""
+    if user1_id == user2_id:
+        return True
+    
+    user1_friends = get_friends(user1_id)
+    return str(user2_id) in user1_friends
+
+def send_friend_request(sender_id, receiver_id):
+    """Envia uma solicitação de amizade"""
+    ensure_friends_csv()
+    
+    # Verifica se já existe uma solicitação ou amizade
+    with open(FRIENDS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if ((row['user1_id'] == str(sender_id) and row['user2_id'] == str(receiver_id)) or
+                (row['user1_id'] == str(receiver_id) and row['user2_id'] == str(sender_id))):
+                return False  # Já existe uma solicitação/amizade
+    
+    # Adiciona nova solicitação
+    with open(FRIENDS_PATH, 'a', newline='', encoding='utf-8') as f:
+        csv.writer(f).writerow([
+            str(sender_id),
+            str(receiver_id),
+            'pending',
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ])
+    
+    return True
+
+def accept_friend_request(user1_id, user2_id):
+    """Aceita uma solicitação de amizade"""
+    ensure_friends_csv()
+    rows = []
+    updated = False
+    
+    with open(FRIENDS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames
+        for row in reader:
+            if (row['user1_id'] == str(user2_id) and row['user2_id'] == str(user1_id) and row['status'] == 'pending'):
+                row['status'] = 'accepted'
+                updated = True
+            rows.append(row)
+    
+    if updated:
+        with open(FRIENDS_PATH, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+        
+        # Cria notificação para quem enviou a solicitação
+        create_notification(
+            user_id=user2_id,
+            type='friend_accepted',
+            actor_id=user1_id,
+            text=f"{get_user_by_id(user1_id)['username']} aceitou sua solicitação de amizade!"
+        )
+        
+        return True
+    
+    return False
+
+def check_pending_request(user1_id, user2_id):
+    """Verifica se existe solicitação pendente entre dois usuários"""
+    ensure_friends_csv()
+    with open(FRIENDS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if ((row['user1_id'] == str(user1_id) and row['user2_id'] == str(user2_id) and row['status'] == 'pending') or
+                (row['user1_id'] == str(user2_id) and row['user2_id'] == str(user1_id) and row['status'] == 'pending')):
+                return True
+    return False
+
+# ========================================
+# SISTEMA DE NOTIFICAÇÕES
+# ========================================
+def create_notification(user_id, type, actor_id=None, post_id=None, text=None):
+    """Cria uma nova notificação"""
+    ensure_notifications_csv()
+    
+    if not text:
+        actor_name = get_user_by_id(actor_id)['username'] if actor_id else ''
+        if type == 'like':
+            text = f"{actor_name} curtiu seu post"
+        elif type == 'friend_accepted':
+            text = f"{actor_name} aceitou sua solicitação de amizade"
+        elif type == 'friend_request':
+            text = f"{actor_name} enviou uma solicitação de amizade"
+    
+    with open(NOTIF_PATH, 'a', newline='', encoding='utf-8') as f:
+        csv.writer(f).writerow([
+            next_notif_id(),
+            str(user_id),
+            type,
+            str(actor_id) if actor_id else '',
+            str(post_id) if post_id else '',
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            '0',  # não lida
+            text
+        ])
 
 # ========================================
 # DECORATOR DE AUTENTICAÇÃO
@@ -222,34 +398,24 @@ def logout():
 @app.get('/home')
 @login_required
 def home_page():
-    """Feed principal com todos os posts"""
+    """Feed principal com posts de amigos mútuos"""
     ensure_posts_csv()
-
+    user_id = str(session.get('user_id'))
+    
+    # Busca amigos mútuos
+    friends = get_friends(user_id)
+    friends.append(user_id)  # Inclui os próprios posts
+    
     # Carrega posts do CSV
     with open(POSTS_PATH, 'r', newline='', encoding='utf-8') as f:
-        posts = list(csv.DictReader(f))
-
-    # Função para converter timestamp UTC para horário de São Paulo
-    def to_sp_display(ts_str: str) -> str:
-        try:
-            # Se for ISO (com "T")
-            if 'T' in ts_str:
-                dt = datetime.fromisoformat(ts_str)
-                if dt.tzinfo is None:
-                    dt = dt.replace(tzinfo=timezone.utc)
-            else:
-                # Formato antigo "YYYY-MM-DD HH:MM:SS" sem tz => considere UTC
-                dt = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
-
-            # Converte para fuso de São Paulo
-            dt_sp = dt.astimezone(ZoneInfo("America/Sao_Paulo"))
-            return dt_sp.strftime("%d/%m/%Y %H:%M")
-        except Exception:
-            return ts_str
+        all_posts = list(csv.DictReader(f))
+    
+    # Filtra posts apenas de amigos mútuos
+    posts = [p for p in all_posts if p['author_id'] in friends]
 
     # Adiciona timestamp formatado em cada post
     for p in posts:
-        p['timestamp_display'] = to_sp_display(p.get('timestamp', ''))
+        p['timestamp_display'] = format_timestamp(p.get('timestamp', ''))
 
     # Ordena do mais recente pro mais antigo
     posts.sort(key=lambda x: int(x['id']), reverse=True)
@@ -258,14 +424,58 @@ def home_page():
         'feed.html',
         posts=posts,
         username=session.get('username'),
-        user_id=str(session.get('user_id'))
+        user_id=str(session.get('user_id')),
+        friend_requests=get_friend_requests(user_id)
     )
 
-@app.get('/inbox')
+@app.get('/perfil')
 @login_required
-def inbox():
-    """Inbox (por enquanto só redireciona pro feed)"""
-    return redirect(url_for('home_page'))
+def meu_perfil():
+    """Redireciona para o próprio perfil"""
+    return redirect(url_for('perfil', user_id=session.get('user_id')))
+
+@app.get('/perfil/<user_id>')
+@login_required
+def perfil(user_id):
+    """Página de perfil do usuário"""
+    profile_user = get_user_by_id(user_id)
+    if not profile_user:
+        return redirect(url_for('home_page'))
+    
+    # Busca os 3 posts mais recentes do usuário
+    ensure_posts_csv()
+    user_posts = []
+    
+    with open(POSTS_PATH, 'r', newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row['author_id'] == str(user_id):
+                user_posts.append(row)
+    
+    # Ordena e pega os 3 mais recentes
+    user_posts.sort(key=lambda x: int(x['id']), reverse=True)
+    recent_posts = user_posts[:3]
+    
+    # Formata timestamps
+    for p in recent_posts:
+        p['timestamp_display'] = format_timestamp(p.get('timestamp', ''))
+    
+    current_user_id = str(session.get('user_id'))
+    is_my_profile = (current_user_id == str(user_id))
+    are_we_friends = are_friends(current_user_id, user_id)
+    has_pending_request = check_pending_request(current_user_id, user_id)
+    
+    return render_template(
+        'feed.html',
+        profile_user=profile_user,
+        recent_posts=recent_posts,
+        username=session.get('username'),
+        user_id=current_user_id,
+        is_my_profile=is_my_profile,
+        are_we_friends=are_we_friends,
+        has_pending_request=has_pending_request,
+        friend_requests=get_friend_requests(current_user_id)
+    )
 
 # ========================================
 # ROTAS - POSTS
@@ -297,7 +507,7 @@ def postar():
 @app.post('/curtir/<int:post_id>')
 @login_required
 def curtir(post_id):
-    """Curte ou descurte um post (toggle)"""
+    """Curte ou descurte um post (toggle) - AJAX version"""
     ensure_posts_csv()
     me = str(session.get('user_id'))
 
@@ -307,27 +517,35 @@ def curtir(post_id):
         posts = list(reader)
         fieldnames = list(reader.fieldnames or [])
 
-    # Garante que o campo likes_by existe (compatibilidade com CSVs antigos)
+    # Garante que o campo likes_by existe
     if 'likes_by' not in fieldnames:
         fieldnames.append('likes_by')
         for p in posts:
             if 'likes_by' not in p:
                 p['likes_by'] = ''
 
+    post_author_id = None
+    was_liked = False
+    new_likes_count = 0
+    
     # Aplica o toggle no post certo
     for p in posts:
         if int(p['id']) == post_id:
+            post_author_id = p['author_id']
             likes_by = [x for x in (p.get('likes_by') or '').split(';') if x]
             
             if me in likes_by:
                 # Já curti, então descurto
                 likes_by = [x for x in likes_by if x != me]
+                was_liked = False
             else:
                 # Ainda não curti, então curto
                 likes_by.append(me)
+                was_liked = True
             
             p['likes_by'] = ';'.join(likes_by)
             p['likes'] = str(len(likes_by))
+            new_likes_count = len(likes_by)
             break
 
     # Reescreve o CSV com a atualização
@@ -335,8 +553,55 @@ def curtir(post_id):
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(posts)
+    
+    # Cria notificação se foi uma curtida (não descurtida)
+    if was_liked and post_author_id and post_author_id != me:
+        create_notification(
+            user_id=post_author_id,
+            type='like',
+            actor_id=me,
+            post_id=post_id
+        )
 
-    return redirect(url_for('home_page'))
+    if request.headers.get('X-Requested-With') == 'fetch':
+        return jsonify({
+            'success': True,
+            'likes': new_likes_count,
+            'liked': was_liked
+        })
+    
+    return redirect(request.referrer or url_for('home_page'))
+
+# ========================================
+# ROTAS - AMIZADES
+# ========================================
+@app.post('/add_friend/<user_id>')
+@login_required
+def add_friend(user_id):
+    """Envia solicitação de amizade"""
+    sender_id = str(session.get('user_id'))
+    
+    if send_friend_request(sender_id, user_id):
+        # Cria notificação para o usuário que recebeu a solicitação
+        create_notification(
+            user_id=user_id,
+            type='friend_request',
+            actor_id=sender_id,
+            text=f"{session.get('username')} enviou uma solicitação de amizade"
+        )
+    
+    return redirect(request.referrer or url_for('home_page'))
+
+@app.post('/accept_friend/<user_id>')
+@login_required
+def accept_friend(user_id):
+    """Aceita solicitação de amizade"""
+    receiver_id = str(session.get('user_id'))
+    
+    if accept_friend_request(receiver_id, user_id):
+        pass  # Notificação é criada dentro da função
+    
+    return redirect(request.referrer or url_for('home_page'))
 
 # ========================================
 # API - USUÁRIOS
@@ -344,7 +609,20 @@ def curtir(post_id):
 @app.get('/api/users')
 @login_required
 def api_users():
-    """Lista usuários disponíveis pro chat (menos eu mesmo)"""
+    """Lista usuários disponíveis pro chat (apenas amigos mútuos)"""
+    uid = str(session.get('user_id'))
+    all_users = get_all_users()
+    
+    # Filtra apenas amigos mútuos
+    friends = get_friends(uid)
+    users = [u for u in all_users if u['id'] != uid and u['id'] in friends]
+    
+    return jsonify({'users': users})
+
+@app.get('/api/all_users')
+@login_required
+def api_all_users():
+    """Lista todos os usuários (para busca)"""
     uid = str(session.get('user_id'))
     users = [u for u in get_all_users() if u['id'] != uid]
     return jsonify({'users': users})
@@ -355,14 +633,14 @@ def api_users():
 @app.get('/api/messages')
 @login_required
 def api_messages():
-    """Busca mensagens entre mim e outro usuário (com suporte a polling incremental)"""
+    """Busca mensagens entre mim e outro usuário (apenas se forem amigos)"""
     partner_id = request.args.get('partner_id', type=str)
     since_id = request.args.get('since_id', default=0, type=int)
     me = str(session.get('user_id'))
 
-    # Validação
-    if not partner_id or not user_exists(partner_id):
-        return jsonify({'error': 'partner_id inválido'}), 400
+    # Validação - só permite chat com amigos mútuos
+    if not partner_id or not user_exists(partner_id) or not are_friends(me, partner_id):
+        return jsonify({'error': 'partner_id inválido ou não são amigos'}), 400
 
     ensure_messages_csv()
     items = []
@@ -401,15 +679,16 @@ def api_messages():
 @app.post('/api/send')
 @login_required
 def api_send():
-    """Envia uma mensagem pra outro usuário"""
+    """Envia uma mensagem pra outro usuário (apenas se forem amigos)"""
     data = request.get_json(silent=True) or {}
     partner_id = str(data.get('partner_id', '')).strip()
     content = str(data.get('content', '')).strip()
     me = str(session.get('user_id'))
 
-    # Validações
-    if not partner_id or not user_exists(partner_id):
-        return jsonify({'error': 'partner_id inválido'}), 400
+    # Validações - só permite chat com amigos mútuos
+    if not partner_id or not user_exists(partner_id) or not are_friends(me, partner_id):
+        return jsonify({'error': 'partner_id inválido ou não são amigos'}), 400
+        
     if not content:
         return jsonify({'error': 'Mensagem vazia'}), 400
 
@@ -480,7 +759,7 @@ def api_notifications():
     
     with open(NOTIF_PATH, 'r', newline='', encoding='utf-8') as f:
         for r in csv.DictReader(f):
-            if r.get('user_id') == me and r.get('type') == 'dm':
+            if r.get('user_id') == me:
                 items.append(r)
     
     # Ordena do mais recente pro mais antigo
@@ -511,7 +790,7 @@ def api_notifications_mark_all_read():
     
     # Marca como lidas as minhas notificações
     for r in rows:
-        if r['user_id'] == me and r.get('type') == 'dm':
+        if r['user_id'] == me:
             r['read'] = '1'
     
     # Reescreve o CSV
@@ -526,4 +805,11 @@ def api_notifications_mark_all_read():
 # INICIALIZAÇÃO
 # ========================================
 if __name__ == '__main__':
+    # Garante que todos os CSVs existam
+    ensure_csv()
+    ensure_messages_csv()
+    ensure_posts_csv()
+    ensure_notifications_csv()
+    ensure_friends_csv()
+    
     app.run(debug=True)

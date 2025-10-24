@@ -61,13 +61,8 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: fixed; /* fixa a barra */
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
+  position: relative; /* permite centralizar o título absoluto */
 }
-
 
 .header-left { display: flex; align-items: center; }
 
@@ -220,19 +215,8 @@ header {
 /* ========================================
    LAYOUT PRINCIPAL
    ======================================== */
-
-.layout {
-  display: flex;
-  flex-direction: column;
-  height: auto;
-}
-
-
-main {
-  flex: 1;
-  padding: 80px 20px 20px 20px; /* espaço extra no topo */
-  overflow-y: visible; /* remove rolagem vertical */
-}
+.layout { display: flex; height: calc(100vh - 60px); }
+main { flex: 1; padding: 20px; overflow-y: auto; }
 
 /* Abas de conteúdo: só uma ativa por vez */
 .content { display: none; }
@@ -271,10 +255,10 @@ main {
 .new-post-form {
   background: #ffffff;
   border: 1px solid rgba(0,0,0,0.06);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px;
   margin-bottom: 18px;
-  box-shadow: 0 4px 16px #ccc;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
   transition: box-shadow .2s ease, transform .05s ease;
 }
 .new-post-form:focus-within {
@@ -347,10 +331,9 @@ main {
   background-color: white;
   margin: 10px 0;
   padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px #ccc;
 }
-
 
 /* Cabeçalho do post (avatar + nome + data) */
 .post-header {
