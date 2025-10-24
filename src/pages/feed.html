@@ -13,17 +13,6 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='styles/styleFeed.css') }}"
     />
-    <!-- React 18 via CDN (DEV) -->
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-    ></script>
-    <!-- Babel para permitir JSX inline (apenas em desenvolvimento) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
 
   <body>
@@ -69,7 +58,7 @@
         />
         <div class="menu-dropdown hidden" id="user-dropdown">
           <ul>
-            <li onclick="showSection('perfil')">Perfil</li>
+            <li onclick="goToMyProfile()">Meu Perfil</li>
             <li onclick="logout()">Sair</li>
           </ul>
         </div>
@@ -78,30 +67,114 @@
 
     <div class="layout">
       <main>
-        <!-- Seção de perfil (ainda em construção) -->
+        <!-- Seção de perfil -->
         <section id="perfil" class="content">
           <div class="profile">
-            <div class="avatar">
-              <img
-                src="{{ url_for('static', filename='images/perfil.jpg') }}"
-                alt="Foto de perfil"
-                class="perfil-principal"
-              />
-            </div>
-            <div class="posts">
-              <div class="post">Post 1</div>
-              <div class="post">Post 2</div>
-              <div class="post">Post 3</div>
-            </div>
+            {% if profile_user %}
+              <!-- Perfil de outro usuário -->
+              <div class="avatar">
+                <img
+                  src="{{ url_for('static', filename='images/perfil.jpg') }}"
+                  alt="Foto de perfil"
+                  class="perfil-principal"
+                />
+              </div>
+              <h2>{{ profile_user.username }}</h2>
+              
+              
+              {% if not is_my_profile %}
+                {% if are_we_friends %}
+                  <p class="friend-status">✅ Amigos</p>
+                {% elif has_pending_request %}
+                  <p class="friend-status">⏳ Solicitação enviada</p>
+                {% else %}
+                  <form action="{{ url_for('add_friend', user_id=profile_user.id) }}" method="POST">
+                    <button type="submit" class="add-friend-btn">Adicionar Amigo</button>
+                  </form>
+                {% endif %}
+              {% endif %}
+              
+              <h3>Últimos 3 posts:</h3>
+              <div class="posts">
+                {% if recent_posts %}
+                  {% for post in recent_posts %}
+                    <div class="post">
+                      <div class="post-header">
+                        <small>{{ post.timestamp_display }}</small>
+                      </div>
+                      <p>{{ post.content }}</p>
+                      <div class="post-stats">
+                        <span>❤️ {{ post.likes }} curtidas</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p class="empty">Nenhum post ainda.</p>
+                {% endif %}
+              </div>
+            {% else %}
+              <!-- Meu perfil -->
+              <div class="avatar">
+                <img
+                  src="{{ url_for('static', filename='images/perfil.jpg') }}"
+                  alt="Foto de perfil"
+                  class="perfil-principal"
+                />
+              </div>
+              <h2>{{ username }}</h2>
+              
+              <h3>Meus últimos 3 posts:</h3>
+              <div class="posts">
+                {% if recent_posts %}
+                  {% for post in recent_posts %}
+                    <div class="post">
+                      <div class="post-header">
+                        <small>{{ post.timestamp_display }}</small>
+                      </div>
+                      <p>{{ post.content }}</p>
+                      <div class="post-stats">
+                        <span>❤️ {{ post.likes }} curtidas</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p class="empty">Você ainda não fez nenhum post.</p>
+                {% endif %}
+              </div>
+            {% endif %}
           </div>
         </section>
 
         <!-- Feed principal: formulário de novo post + lista de posts -->
         <section id="inicio" class="content active">
+          <!-- Solicitações de amizade -->
+          {% if friend_requests %}
+          <div class="friend-requests">
+            <h3>Solicitações de Amizade</h3>
+            {% for request in friend_requests %}
+            <div class="friend-request">
+              <span>{{ request.username }}</span>
+              <form action="{{ url_for('accept_friend', user_id=request.user_id) }}" method="POST" style="display: inline;">
+                <button type="submit" class="accept-friend-btn">Aceitar</button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
           <div class="feed-container">
             <!-- Form de novo post: envia para /postar (POST) -->
-            <form action="{{ url_for('postar') }}" method="POST" class="new-post-form">
-              <textarea name="content" rows="3" placeholder="Escreva um post..." required></textarea>
+            <form
+              action="{{ url_for('postar') }}"
+              method="POST"
+              class="new-post-form"
+            >
+              <textarea
+                name="content"
+                rows="3"
+                placeholder="Escreva um post..."
+                required
+              ></textarea>
               <div>
                 <button type="submit">Publicar</button>
               </div>
@@ -109,72 +182,63 @@
 
             <!-- Lista de posts vinda do backend -->
             <div class="posts">
-              {% if posts %} {% for p in posts %}
-              <div class="post">
-                <!-- Cabeçalho do post: avatar, nome e timestamp -->
-                <div class="post-header">
-                  <img
-                    src="{{ url_for('static', filename='images/perfil.jpg') }}"
-                    alt="{{ p.author_name }}"
-                    class="post-avatar"
-                  />
-                  <div>
-                    <h3>{{ p.author_name }}</h3>
-                    <small>{{ p.timestamp_display}}</small>
+              {% if posts %} 
+                {% for p in posts %}
+                <div class="post">
+                  <!-- Cabeçalho do post: avatar, nome e timestamp -->
+                  <div class="post-header">
+                    <img
+                      src="{{ url_for('static', filename='images/perfil.jpg') }}"
+                      alt="{{ p.author_name }}"
+                      class="post-avatar"
+                    />
+                    <div>
+                      <h3>{{ p.author_name }}</h3>
+                      <small>{{ p.timestamp_display}}</small>
+                    </div>
+                  </div>
+
+                  <!-- Conteúdo do post -->
+                  <p>{{ p.content }}</p>
+
+                  <!-- Botão de curtir com AJAX -->
+                  <div class="like-section">
+                    <button class="heart-btn" onclick="toggleCurtida(this, {{ p.id }})">
+                      {% set liked = (p.get('likes_by') or '') and (user_id in (p.get('likes_by').split(';'))) %}
+                      <img 
+                        src="{{ url_for('static', filename=('images/redheart.png' if liked else 'images/coracao.png')) }}" 
+                        alt="Curtir" 
+                        class="heart-icon"
+                      />
+                      <span class="like-count" id="like-count-{{ p.id }}">{{ p.likes or 0 }}</span>
+                    </button>
                   </div>
                 </div>
-
-                <!-- Conteúdo do post -->
-                <p>{{ p.content }}</p>
-
-                <!-- Verifica se o usuário atual já curtiu este post -->
-                {% set liked = (p.get('likes_by') or '') and (user_id in
-                (p.get('likes_by').split(';'))) %}
-
-                <!-- Botão de curtir: chama toggleCurtida() que faz POST em /curtir/<id> -->
-                <div
-                  class="like-widget-root"
-                  data-post-id="{{ p.id }}"
-                  data-initial-likes="{{ p.likes or 0 }}"
-                  data-liked="{{ 'true' if liked else 'false' }}"
-                ></div>
-              </div>
-              {% endfor %} {% else %}
-              <p class="empty">Nenhum post ainda. Seja o primeiro a postar!</p>
+                {% endfor %} 
+              {% else %}
+                <p class="empty">Nenhum post ainda. Seja o primeiro a postar ou adicione alguns amigos!</p>
               {% endif %}
             </div>
           </div>
         </section>
-
-        <!-- Seção de configurações (comentada por enquanto)
-      <section id="configuracoes" class="content">
-        <div class="configuracoes-container">
-          <div class="config-item">
-            <p><strong>Privacidade e Visibilidade</strong></p>
-          </div>
-          <div class="config-item">
-            <p><strong>Segurança e Autenticação</strong></p>
-          </div>
-          <div class="config-item">
-            <p><strong>Conteúdo e Experiência</strong></p>
-          </div>
-          <div class="config-item">
-            <p><strong>Bloqueios e Moderação</strong></p>
-          </div>
-        </div>
-      </section>
-      --></main>
+      </main>
     </div>
 
     <!-- Botão flutuante para abrir/fechar o chat DM -->
     <button class="chat-button" onclick="toggleChat()">CHAT</button>
 
-    <!-- Caixa de chat (DM) -->
+    <!-- Caixa de chat (DM) - Só aparece se houver amigos -->
     <div id="chat-box" class="chat-box hidden">
-      <div
-        id="dm-chat-root"
-        data-current-user-id="{{ session.get('user_id') }}"
-      ></div>
+      <div class="chat-header">
+        <select id="chat-partner">
+          <option value="">Selecione um amigo...</option>
+        </select>
+      </div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Digite uma mensagem..." />
+        <button id="chat-send">Enviar</button>
+      </div>
     </div>
 
     <!-- Modal de notificações -->
@@ -226,9 +290,9 @@
           <input
             type="text"
             id="user-search-input"
-            placeholder="Buscar por nome ou email..."
+            placeholder="Buscar por nome..."
           />
-          <div id="search-results" class="hidden"></div>
+          <div id="search-results"></div>
         </div>
       </div>
     </div>
@@ -236,6 +300,7 @@
     <!-- Exponho o ID do usuário atual para o JS saber quem é "eu" nas mensagens -->
     <script>
       window.CURRENT_USER_ID = "{{ session.get('user_id') }}";
+      window.CURRENT_USERNAME = "{{ session.get('username') }}";
     </script>
     <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
   </body>

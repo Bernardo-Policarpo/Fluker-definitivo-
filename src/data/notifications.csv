@@ -1,1 +1,3 @@
 id,user_id,type,actor_id,message_id,timestamp,read,text
+1,2,friend_request,4,,2025-10-23 23:02:29,1,teste1 enviou uma solicitação de amizade
+2,4,friend_accepted,2,,2025-10-23 23:03:16,0,Furlan aceitou sua solicitação de amizade!
