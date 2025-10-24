@@ -1,3 +1,7 @@
 id,user_id,type,actor_id,message_id,timestamp,read,text
 1,2,friend_request,4,,2025-10-23 23:02:29,1,teste1 enviou uma solicitação de amizade
-2,4,friend_accepted,2,,2025-10-23 23:03:16,0,Furlan aceitou sua solicitação de amizade!
+2,4,friend_accepted,2,,2025-10-23 23:03:16,1,Furlan aceitou sua solicitação de amizade!
+3,7,friend_request,3,,2025-10-24 06:08:07,0,Bernardo enviou uma solicitação de amizade
+4,2,like,3,6,2025-10-24 06:08:17,0,Bernardo curtiu seu post
+5,2,like,3,6,2025-10-24 06:08:17,0,Bernardo curtiu seu post
+6,2,like,3,6,2025-10-24 06:08:18,0,Bernardo curtiu seu post

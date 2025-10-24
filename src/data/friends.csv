@@ -3,3 +3,4 @@ user1_id,user2_id,status,timestamp
 4,5,accepted,2025-10-23 20:35:25
 6,7,accepted,2025-10-23 22:31:34
 4,2,accepted,2025-10-23 23:02:29
+3,7,pending,2025-10-24 06:08:07

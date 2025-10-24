@@ -15,16 +15,6 @@ let likesSyncTimer = null;
 let notifTimer = null;
 
 /* ========================================
-   INICIALIZAÇÃO
-   ======================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  showSection("inicio");
-  startLikesSync();
-  startNotifPolling();
-  setupNotificationModalListeners();
-});
-
-/* ========================================
    NAVEGAÇÃO ENTRE SEÇÕES
    ======================================== */
 function showSection(id) {
