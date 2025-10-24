@@ -32,6 +32,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Configuro os listeners do modal de notificações
   setupNotificationModalListeners();
+
+  document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("user-dropdown");
+  const avatar = document.querySelector(".perfil-topo");
+
+  // Se o dropdown estiver visível e o clique for fora dele e fora do avatar
+  if (dropdown && !dropdown.classList.contains("hidden")) {
+    if (!dropdown.contains(e.target) && !avatar.contains(e.target)) {
+      dropdown.classList.add("hidden");
+    }
+  }
+});
 });
 
 /* ========================================
