@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fluker - Perfil</title>
+
+    <!-- Favicon -->
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/Logo-Fluker.png') }}"
+      type="image/x-icon"
+    />
+
+    <!-- CSS principal -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/stylePerfil.css') }}"
+    />
+
+    <!-- React 18 via CDN (ambiente de desenvolvimento) -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+  </head>
+<body>
+    <!-- Cabeçalho: logo, atalho para home, busca, notificações e menu do usuário -->
+    <header>
+      <div class="header-left">
+        <!-- Logo da aplicação -->
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="Logo FLUKER"
+          class="logo"
+        />
+
+        <!-- Título central que navega para /home -->
+        <button class="title-center" onclick="window.location.href = '/home'">
+          FLUKER
+        </button>
+      </div>
+
+      <!-- Área de ações do usuário: busca, notificações e perfil -->
+      <div class="user-menu">
+        <!-- Botão para abrir modal de busca de usuários -->
+        <div class="search-users-wrapper" onclick="openUserSearchModal()">
+          <img
+            src="{{ url_for('static', filename='images/Lupa.png') }}"
+            alt="Buscar usuários"
+            class="icone-busca"
+          />
+        </div>
+
+        <!-- Sino de notificações com indicador de não lidas -->
+        <div class="bell-wrapper" onclick="openNotificationsModal()">
+          <img
+            src="{{ url_for('static', filename='images/sino.png') }}"
+            alt="Notificações"
+            class="icone-sino"
+          />
+          <span id="notif-badge" class="notif-badge"></span>
+        </div>
+
+        <!-- Avatar com dropdown de ações (perfil/sair) -->
+        <img
+          src="{{ url_for('static', filename='images/perfil.jpg') }}"
+          alt="Perfil"
+          class="perfil-topo"
+          onclick="toggleUserMenu()"
+        />
+        <div class="menu-dropdown hidden" id="user-dropdown">
+          <ul>
+            <li onclick="goToMyProfile()">Meu Perfil</li>
+            <li onclick="logout()">Sair</li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- Layout principal -->
+    <div class="layout">
+      <main>
+        <!-- Seção de perfil (mostra meu perfil ou o de outro usuário) -->
+        <section id="perfil" class="content">
+          <div class="profile">
+            {% if profile_user %}
+            <!-- Perfil de outro usuário -->
+            <div class="avatar">
+              <img
+                src="{{ url_for('static', filename='images/perfil.jpg') }}"
+                alt="Foto de perfil"
+                class="perfil-principal"
+              />
+            </div>
+
+            <!-- Nome do usuário visitado -->
+            <h2>{{ profile_user.username }}</h2>
+
+            <!-- Estado de amizade e ações relacionadas (se não for meu perfil) -->
+            {% if not is_my_profile %} {% if are_we_friends %}
+            <p class="friend-status">✅ Amigos</p>
+            {% elif has_pending_request %}
+            <p class="friend-status">⏳ Solicitação enviada</p>
+            {% else %}
+            <form
+              action="{{ url_for('add_friend', user_id=profile_user.id) }}"
+              method="POST"
+            >
+              <button type="submit" class="add-friend-btn">
+                Adicionar Amigo
+              </button>
+            </form>
+            {% endif %} {% endif %}
+
+            <!-- Últimos 3 posts do usuário visitado -->
+            <h3>Últimos 3 posts:</h3>
+            <div class="posts">
+              {% if recent_posts %} {% for post in recent_posts %}
+              <div class="post">
+                <div class="post-header">
+                  <small>{{ post.timestamp_display }}</small>
+                </div>
+                <p>{{ post.content }}</p>
+                <div class="post-stats">
+                  <span>❤️ {{ post.likes }} curtidas</span>
+                </div>
+              </div>
+              {% endfor %} {% else %}
+              <p class="empty">Nenhum post ainda.</p>
+              {% endif %}
+            </div>
+
+            {% else %}
+            <!-- Meu perfil -->
+            <div class="avatar">
+              <img
+                src="{{ url_for('static', filename='images/perfil.jpg') }}"
+                alt="Foto de perfil"
+                class="perfil-principal"
+              />
+            </div>
+
+            <!-- Meu nome de usuário -->
+            <h2>{{ username }}</h2>
+
+            <!-- Meus últimos 3 posts -->
+            <h3>Meus últimos 3 posts:</h3>
+            <div class="posts">
+              {% if recent_posts %} {% for post in recent_posts %}
+              <div class="post">
+                <div class="post-header">
+                  <small>{{ post.timestamp_display }}</small>
+                </div>
+                <p>{{ post.content }}</p>
+                <div class="post-stats">
+                  <span>❤️ {{ post.likes }} curtidas</span>
+                </div>
+              </div>
+              {% endfor %} {% else %}
+              <p class="empty">Você ainda não fez nenhum post.</p>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </section>
+        </main>
+</body>
+</html>
