@@ -1,0 +1,14 @@
+# Ignorar arquivos de configuração do Stylelint
+.stylelintrc.json
+
+# Dependências de Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Arquivos de IDEs (ex: VS Code, IntelliJ)
+.vscode/
+.idea/
+*.iml
