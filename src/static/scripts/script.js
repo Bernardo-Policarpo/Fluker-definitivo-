@@ -2,17 +2,10 @@
    VARIÁVEIS GLOBAIS E ESTADO
    ======================================== */
 
-// Estado do chat DM (uso simples para controlar abertura, parceiro e polling)
+// Estado do chat DM (controle de abertura)
 let CHAT = {
   open: false,
-  partnerId: null,
-  lastMsgId: 0,
-  pollTimer: null,
 };
-
-// Timers de sincronização (likes em tempo real e notificações)
-let likesSyncTimer = null;
-let notifTimer = null;
 
 /* ========================================
    INICIALIZAÇÃO
@@ -20,15 +13,6 @@ let notifTimer = null;
 document.addEventListener("DOMContentLoaded", () => {
   // Começo no feed por padrão
   showSection("inicio");
-
-  // Liga a sincronização de likes (polling leve)
-  startLikesSync();
-
-  // Liga o polling de notificações (badge e modal)
-  startNotifPolling();
-
-  // Configuro a delegação de eventos do sistema de curtidas
-  setupLikeListeners();
 
   // Configuro os listeners do modal de notificações
   setupNotificationModalListeners();
@@ -70,419 +54,45 @@ function logout() {
 // Abre/fecha a caixa de chat
 function toggleChat() {
   const box = document.getElementById("chat-box");
-  if (!box) return;
+  const isHidden = box.classList.contains("hidden");
 
-  CHAT.open = !CHAT.open;
+  if (isHidden) {
+    // mostrar
+    box.classList.remove("hidden", "hiding");
+    void box.offsetWidth; // reflow para transição
+    box.classList.add("show");
 
-  if (CHAT.open) {
-    box.classList.remove("hidden");
-    initChat();
+    // foca no input e desce para o fim após a animação
+    setTimeout(() => {
+      document.getElementById("chat-input")?.focus();
+      const container = document.querySelector("#dm-chat-root .chat-messages");
+      if (container) container.scrollTop = container.scrollHeight;
+    }, 200);
   } else {
-    box.classList.add("hidden");
-    stopPolling();
-  }
-}
-
-// Inicializa chat: carrega usuários, define parceiro inicial e listeners
-async function initChat() {
-  await loadUsers();
-
-  const sel = document.getElementById("chat-partner");
-  if (!sel) return;
-
-  // Se já tenho usuários, escolho um parceiro padrão e começo o polling
-  if (sel.options.length > 0) {
-    if (!CHAT.partnerId) CHAT.partnerId = sel.value;
-
-    await loadMessages(true); // primeira carga é full
-    startPolling();
-  }
-
-  // Troca de parceiro atualiza histórico
-  sel.addEventListener("change", async (e) => {
-    CHAT.partnerId = e.target.value;
-    CHAT.lastMsgId = 0;
-    await loadMessages(true);
-  });
-
-  // Envio de mensagem (clique e Enter) com proteção contra spam
-  const sendBtn = document.getElementById("chat-send");
-  const input = document.getElementById("chat-input");
-
-  let lastSendAt = 0;
-  const GAP_MS = 1500;
-
-  function canSendNow() {
-    const now = Date.now();
-    if (now - lastSendAt < GAP_MS) return false;
-    lastSendAt = now;
-    return true;
-  }
-
-  // Clique no botão
-  sendBtn?.addEventListener("click", () => {
-    if (!canSendNow()) return;
-    sendMessage();
-  });
-
-  // Enter no input
-  input?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (!canSendNow()) return;
-      sendMessage();
-    }
-  });
-}
-
-/* ========================================
-   CHAT DM - POLLING DE MENSAGENS
-   ======================================== */
-// Inicia polling de novas mensagens (leve, somente delta)
-function startPolling() {
-  stopPolling();
-  CHAT.pollTimer = setInterval(async () => {
-    if (CHAT.partnerId) {
-      await loadMessages(false);
-    }
-  }, 3000);
-}
-
-// Para o polling do chat
-function stopPolling() {
-  if (CHAT.pollTimer) {
-    clearInterval(CHAT.pollTimer);
-    CHAT.pollTimer = null;
+    // esconder
+    box.classList.remove("show");
+    box.classList.add("hiding");
+    setTimeout(() => {
+      box.classList.add("hidden");
+      box.classList.remove("hiding");
+    }, 160);
   }
 }
 
 /* ========================================
-   CHAT DM - CARREGAMENTO DE DADOS
+   NOTIFICAÇÕES - AÇÕES
    ======================================== */
-// Busca a lista de usuários disponíveis para DM
-async function loadUsers() {
-  try {
-    const res = await fetch("/api/users");
-    if (!res.ok) throw new Error("Falha ao buscar usuários");
-
-    const data = await res.json();
-    const sel = document.getElementById("chat-partner");
-    if (!sel) return;
-
-    sel.innerHTML = "";
-
-    (data.users || []).forEach((u) => {
-      const opt = document.createElement("option");
-      opt.value = u.id;
-      opt.textContent = u.username || u.email || `user_${u.id}`;
-      sel.appendChild(opt);
-    });
-  } catch (e) {
-    console.error("Erro ao carregar usuários", e);
-  }
-}
-
-// Carrega mensagens do parceiro atual (full ou somente novas)
-async function loadMessages(fullReload) {
-  if (!CHAT.partnerId) return;
-
-  try {
-    const url = new URL(window.location.origin + "/api/messages");
-    url.searchParams.set("partner_id", CHAT.partnerId);
-    if (!fullReload && CHAT.lastMsgId > 0) {
-      url.searchParams.set("since_id", CHAT.lastMsgId);
-    }
-
-    const res = await fetch(url.toString());
-    if (!res.ok) throw new Error("Falha ao buscar mensagens");
-
-    const data = await res.json();
-    const container = document.getElementById("chat-messages");
-    if (!container) return;
-
-    if (fullReload) {
-      container.innerHTML = "";
-      CHAT.lastMsgId = 0;
-    }
-
-    // Renderizo apenas o delta (mensagens com id > lastMsgId)
-    let added = 0;
-    (data.messages || []).forEach((m) => {
-      if (m.id > CHAT.lastMsgId) CHAT.lastMsgId = m.id;
-      container.appendChild(renderMessage(m));
-      added++;
-    });
-
-    // Auto-scroll no primeiro load e quando chegam novas
-    if (fullReload || added > 0) {
-      container.scrollTop = container.scrollHeight;
-    }
-  } catch (e) {
-    console.error("Erro ao carregar mensagens", e);
-  }
-}
-
-// Monta um elemento visual para uma mensagem
-function renderMessage(m) {
-  const wrap = document.createElement("div");
-  wrap.className = "msg-line";
-
-  // Formato HH:MM amigável
-  let hhmm = "";
-  try {
-    const d = new Date(m.timestamp);
-    const h = String(d.getHours()).padStart(2, "0");
-    const min = String(d.getMinutes()).padStart(2, "0");
-    hhmm = `${h}:${min}`;
-  } catch {
-    hhmm = "";
-  }
-
-  // Destaque visual se a mensagem é minha ou do parceiro
-  const who = m.sender_id === window.CURRENT_USER_ID ? "me" : "partner";
-
-  // textContent para evitar XSS
-  wrap.textContent = `[${hhmm}] <${who}>: ${m.content}`;
-  wrap.dataset.msgId = m.id;
-  wrap.classList.add(who === "me" ? "msg-me" : "msg-partner");
-
-  return wrap;
-}
-
-/* ========================================
-   CHAT DM - ENVIO DE MENSAGENS
-   ======================================== */
-// Envia a mensagem atual e busca o delta
-async function sendMessage() {
-  const input = document.getElementById("chat-input");
-  if (!input) return;
-
-  const text = (input.value || "").trim();
-  if (!text || !CHAT.partnerId) return;
-
-  try {
-    const res = await fetch("/api/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ partner_id: CHAT.partnerId, content: text }),
-    });
-
-    const data = await res.json();
-    if (data?.ok) {
-      input.value = "";
-      await loadMessages(false);
-    }
-  } catch (e) {
-    console.error("Erro ao enviar", e);
-  }
-}
-
-/* ========================================
-   SISTEMA DE CURTIDAS - CONFIGURAÇÃO
-   ======================================== */
-// Configura delegação de eventos para curtir/descurtir
-function setupLikeListeners() {
-  const postsContainer = document.querySelector(".posts");
-  if (!postsContainer) return;
-
-  postsContainer.addEventListener("submit", async (e) => {
-    const form = e.target;
-    if (!(form instanceof HTMLFormElement)) return;
-
-    const action = form.getAttribute("action") || "";
-    if (!/\/curtir\/\d+/.test(action)) return;
-
-    e.preventDefault();
-    await handleLikeSubmit(form);
-  });
-}
-
-// Trata o submit de curtida com atualização otimista
-async function handleLikeSubmit(form) {
-  const btn = form.querySelector("button");
-  if (!btn) return;
-
-  const currentLabel = (btn.textContent || "").trim();
-  const match = currentLabel.match(/\((\d+)\)\s*$/);
-  const currentCount = match ? parseInt(match[1], 10) : 0;
-  const isLikedNow = currentLabel.startsWith("Remover");
-
-  // UI otimista: atualizo label e contador imediatamente
-  const newCount = isLikedNow ? Math.max(0, currentCount - 1) : currentCount + 1;
-  const newLabel = (isLikedNow ? "Curtir" : "Remover curtida") + ` (${newCount})`;
-
-  btn.disabled = true;
-  btn.textContent = newLabel;
-
-  try {
-    const res = await fetch(form.getAttribute("action"), {
-      method: "POST",
-      headers: { "X-Requested-With": "fetch" },
-    });
-
-    // Se o servidor não confirmou, volto para o estado anterior
-    if (!res.ok) {
-      btn.textContent = currentLabel;
-    }
-  } catch (err) {
-    console.error("Erro ao curtir:", err);
-    btn.textContent = currentLabel;
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-/* ========================================
-   SISTEMA DE CURTIDAS - ÍCONE
-   ======================================== */
-// Alterna o estado visual do coração (e contador) com fallback em caso de erro
-function toggleCurtida(btn) {
-  const form = btn.closest("form.like-form");
-  if (!form) return;
-
-  const action = form.getAttribute("action") || "";
-  const img = btn.querySelector(".heart-icon");
-  const countEl = form.querySelector(".like-count");
-
-  if (!img) return;
-
-  const match = action.match(/\/curtir\/(\d+)/);
-  if (!match) return;
-
-  const isLiked = img.src.includes("redheart.png");
-
-  // UI otimista: troca o ícone imediatamente
-  const newIcon = isLiked ? "coracao.png" : "redheart.png";
-  const oldIcon = isLiked ? "redheart.png" : "coracao.png";
-  img.src = img.src.replace(oldIcon, newIcon);
-
-  // UI otimista: ajusta contador
-  let currentCount = parseInt((countEl?.textContent || "0").trim(), 10);
-  if (Number.isNaN(currentCount)) currentCount = 0;
-
-  const newCount = isLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
-  if (countEl) countEl.textContent = String(newCount);
-
-  btn.disabled = true;
-
-  fetch(action, {
-    method: "POST",
-    headers: { "X-Requested-With": "fetch" },
-  })
-    .then((res) => {
-      if (!res.ok) {
-        // Se falhou, volto ícone e contador
-        img.src = img.src.replace(newIcon, oldIcon);
-        if (countEl) countEl.textContent = String(currentCount);
-      }
-    })
-    .catch((err) => {
-      console.error("Erro ao curtir:", err);
-      img.src = img.src.replace(newIcon, oldIcon);
-      if (countEl) countEl.textContent = String(currentCount);
-    })
-    .finally(() => {
-      btn.disabled = false;
-    });
-}
-
-/* ========================================
-   SINCRONIZAÇÃO DE CURTIDAS EM TEMPO REAL
-   ======================================== */
-// Inicia polling para alinhar ícones/contadores com o servidor
-function startLikesSync() {
-  stopLikesSync();
-  likesSyncTimer = setInterval(syncLikesFromServer, 2000);
-}
-
-// Para a sincronização de likes
-function stopLikesSync() {
-  if (likesSyncTimer) {
-    clearInterval(likesSyncTimer);
-    likesSyncTimer = null;
-  }
-}
-
-// Puxa do servidor o estado atual de likes e reflete na UI
-async function syncLikesFromServer() {
-  try {
-    const res = await fetch("/api/post_likes");
-    if (!res.ok) return;
-
-    const data = await res.json();
-
-    document.querySelectorAll(".posts .post").forEach((postEl) => {
-      const form = postEl.querySelector('form.like-form[action^="/curtir/"]');
-      if (!form) return;
-
-      const btn = form.querySelector(".heart-btn");
-      const img = form.querySelector(".heart-icon");
-      const countEl = form.querySelector(".like-count");
-      if (!btn || !img) return;
-
-      const action = form.getAttribute("action") || "";
-      const match = action.match(/\/curtir\/(\d+)/);
-      if (!match) return;
-
-      const postId = match[1];
-      const serverInfo = data[postId];
-      if (!serverInfo) return;
-
-      // Alinho ícone conforme se eu curti ou não
-      const likesBy = String(serverInfo.likes_by || "")
-        .split(";")
-        .filter(Boolean);
-      const amILiked = likesBy.includes(String(window.CURRENT_USER_ID));
-      const desiredIcon = amILiked ? "redheart.png" : "coracao.png";
-      const currentIcon = img.src.includes("redheart.png")
-        ? "redheart.png"
-        : "coracao.png";
-
-      if (currentIcon !== desiredIcon) {
-        img.src = img.src.replace(currentIcon, desiredIcon);
-      }
-
-      // Alinho contador
-      const likes = parseInt(serverInfo.likes || 0, 10) || 0;
-      if (countEl && countEl.textContent.trim() !== String(likes)) {
-        countEl.textContent = String(likes);
-      }
-    });
-  } catch (_) {
-    // Sem logs aqui para não poluir o console em caso de timeouts esporádicos
-  }
-}
-
-/* ========================================
-   NOTIFICAÇÕES - POLLING
-   ======================================== */
-// Inicia o polling das notificações (badge + lista do modal)
-function startNotifPolling() {
-  stopNotifPolling();
-  fetchAndRenderNotifications(); // primeira carga
-  notifTimer = setInterval(fetchAndRenderNotifications, 5000);
-}
-
-// Para o polling de notificações
-function stopNotifPolling() {
-  if (notifTimer) {
-    clearInterval(notifTimer);
-    notifTimer = null;
-  }
-}
-
-// Busca notificações e atualiza badge e lista
+// Busca e renderiza notificações (chamada pelo React)
 async function fetchAndRenderNotifications() {
   try {
     const res = await fetch("/api/notifications");
     if (!res.ok) return;
 
     const data = await res.json();
-
     updateNotificationBadge(data.unread || 0);
     renderNotificationList(data.items || []);
   } catch (e) {
-    // Silencioso para não atrapalhar o uso
+    // Silencioso
   }
 }
 
@@ -532,14 +142,10 @@ function renderNotificationList(items) {
     const more = document.createElement("div");
     more.style.textAlign = "center";
     more.style.padding = "6px 0 0";
-    // Poderia adicionar um link "Ver todas" aqui futuramente
     list.appendChild(more);
   }
 }
 
-/* ========================================
-   NOTIFICAÇÕES - AÇÕES
-   ======================================== */
 // Marca todas as notificações como lidas e atualiza UI
 async function markAllRead() {
   const btn = document.getElementById("mark-all-read");

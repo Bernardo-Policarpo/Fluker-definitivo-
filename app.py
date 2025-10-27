@@ -12,7 +12,8 @@ Sistema de rede social com:
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 import secrets
 import csv
 import os
@@ -526,4 +527,4 @@ def api_notifications_mark_all_read():
 # INICIALIZAÇÃO
 # ========================================
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port="5001", debug=True)

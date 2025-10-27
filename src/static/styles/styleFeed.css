@@ -1,7 +1,6 @@
 /* ========================================
    VARIÁVEIS GLOBAIS
    ======================================== */
-/* Paleta e tokens de UI usados no app todo */
 :root {
   --cor-principal: #8b4dff;
   --cor-secundaria: #a166ff;
@@ -18,8 +17,7 @@
   --chat-partner-bg-hover: #e6dbff;
   --chat-partner-text: #2c2452;
 
-  /* Sombra padrão de bolha */
-  --chat-bubble-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  --chat-bubble-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 /* ========================================
@@ -27,13 +25,14 @@
    ======================================== */
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
 }
 
-/* Utilitários rápidos */
-.hidden { display: none; }
+.hidden {
+  display: none;
+}
 
 .empty {
   color: #999;
@@ -42,7 +41,6 @@ body {
   text-align: center;
 }
 
-/* Inputs básicos */
 input[type="text"] {
   width: 100%;
   padding: 10px;
@@ -61,14 +59,19 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative; /* permite centralizar o título absoluto */
+  position: relative;
 }
 
-.header-left { display: flex; align-items: center; }
+.header-left {
+  display: flex;
+  align-items: center;
+}
 
-.logo { height: 40px; width: auto; }
+.logo {
+  height: 40px;
+  width: auto;
+}
 
-/* Botão central do título (fica absolutamente centralizado no header) */
 .title-center {
   position: absolute;
   left: 50%;
@@ -91,7 +94,6 @@ header {
   margin-right: 20px;
 }
 
-/* Wrapper do sino para posicionar o badge */
 .bell-wrapper {
   position: relative;
   display: inline-block;
@@ -100,7 +102,6 @@ header {
   cursor: pointer;
 }
 
-/* Ícone do sino */
 .bell-wrapper .icone-sino,
 .icone-sino {
   width: 100%;
@@ -111,7 +112,6 @@ header {
   border: 1px solid white;
 }
 
-/* Badge de notificações não lidas (fica escondido quando sem .show) */
 .bell-wrapper .notif-badge,
 .notif-badge {
   position: absolute;
@@ -131,9 +131,10 @@ header {
   pointer-events: none;
   display: none;
 }
-.notif-badge.show { display: inline-block; }
+.notif-badge.show {
+  display: inline-block;
+}
 
-/* Avatar no topo com borda branca para destacar */
 .perfil-topo {
   width: 50px;
   height: 50px;
@@ -143,7 +144,6 @@ header {
   border: 2px solid white;
 }
 
-/* Dropdown do usuário */
 .menu-dropdown {
   position: absolute;
   top: 60px;
@@ -154,7 +154,11 @@ header {
   z-index: 100;
   width: 160px;
 }
-.menu-dropdown ul { list-style: none; margin: 0; padding: 10px 0; }
+.menu-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+}
 .menu-dropdown li {
   padding: 10px 15px;
   cursor: pointer;
@@ -162,18 +166,25 @@ header {
   font-weight: bold;
   color: var(--cor-texto);
 }
-.menu-dropdown li:hover { background-color: var(--cor-fundo); }
+.menu-dropdown li:hover {
+  background-color: var(--cor-fundo);
+}
 
 /* ========================================
    MODAL DE NOTIFICAÇÕES
    ======================================== */
-/* Contêiner do modal ocupa a tela toda */
-#notifications-modal { position: fixed; inset: 0; z-index: 1000; }
+#notifications-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
 
-/* Backdrop é transparente (padrão atual) */
-#notifications-modal-backdrop { position: absolute; inset: 0; background: transparent; }
+#notifications-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+}
 
-/* Caixa de conteúdo (card do modal) */
 #notifications-modal-content {
   position: absolute;
   top: 56px;
@@ -183,54 +194,71 @@ header {
   max-height: 60vh;
   overflow: auto;
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   padding: 12px;
 }
-/* Triângulo indicando a origem do popover */
 #notifications-modal-content::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -8px;
   right: var(--arrow-right, 20px);
   border-width: 8px;
   border-style: solid;
   border-color: transparent transparent #fff transparent;
-  filter: drop-shadow(0 -1px 1px rgba(0,0,0,0.06));
+  filter: drop-shadow(0 -1px 1px rgba(0, 0, 0, 0.06));
 }
 
-/* Linhas de notificações */
 #notifications-list .notificacao {
   padding: 8px 4px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   font-size: 12px;
 }
-#notifications-list .notificacao:last-child { border-bottom: none; }
+#notifications-list .notificacao:last-child {
+  border-bottom: none;
+}
 
-/* Botões do modal */
-#mark-all-read { width: 100%; margin-top: 10px !important; }
-#notifications-modal-close { display: none !important; }
+#mark-all-read {
+  width: 100%;
+  margin-top: 10px !important;
+}
+#notifications-modal-close {
+  display: none !important;
+}
 
 /* ========================================
    LAYOUT PRINCIPAL
    ======================================== */
-.layout { display: flex; height: calc(100vh - 60px); }
-main { flex: 1; padding: 20px; overflow-y: auto; }
+.layout {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
 
-/* Abas de conteúdo: só uma ativa por vez */
-.content { display: none; }
-.content.active { display: block; }
+.content {
+  display: none;
+}
+.content.active {
+  display: block;
+}
 
 /* ========================================
-   PERFIL (aba perfil do HTML)
+   PERFIL
    ======================================== */
 .profile {
   background-color: #f5eaff;
   padding: 20px;
   border-radius: 10px;
 }
-.avatar { font-size: 50px; margin-bottom: 10px; }
+.avatar {
+  font-size: 50px;
+  margin-bottom: 10px;
+}
 .perfil-principal {
   width: 100px;
   height: 100px;
@@ -242,7 +270,6 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
 /* ========================================
    FEED E POSTS
    ======================================== */
-/* Container do feed (card grande) */
 .feed-container {
   background-color: #f5eaff;
   padding: 20px;
@@ -251,32 +278,30 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   margin: 0 auto;
 }
 
-/* Form de novo post (efeito de foco suave) */
 .new-post-form {
   background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 14px;
   padding: 14px;
   margin-bottom: 18px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-  transition: box-shadow .2s ease, transform .05s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.05s ease;
 }
 .new-post-form:focus-within {
-  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
 
-/* Textarea do novo post (com foco destacado) */
 .new-post-form textarea {
   width: 100%;
   box-sizing: border-box;
   display: block;
   padding: 12px 14px;
   overflow-x: hidden;
-  margin-bottom: 10px;   /* espaço do botão */
+  margin-bottom: 10px;
   min-height: 84px;
   resize: vertical;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   font-family: inherit;
   font-size: 15px;
@@ -284,16 +309,17 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   background: #faf9ff;
   color: #222;
   outline: none;
-  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
-.new-post-form textarea::placeholder { color: #999; }
+.new-post-form textarea::placeholder {
+  color: #999;
+}
 .new-post-form textarea:focus {
   border-color: var(--cor-principal);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(139,77,255,0.15);
+  box-shadow: 0 0 0 3px rgba(139, 77, 255, 0.15);
 }
 
-/* Botão "Publicar" primário */
 .new-post-form button[type="submit"] {
   appearance: none;
   border: none;
@@ -306,7 +332,8 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   color: #ffffff;
   background: var(--cor-principal);
   box-shadow: 0 6px 14px rgba(84, 92, 245, 0.25);
-  transition: transform .04s ease, box-shadow .2s ease, filter .15s ease, background .2s ease;
+  transition: transform 0.04s ease, box-shadow 0.2s ease, filter 0.15s ease,
+    background 0.2s ease;
 }
 .new-post-form button[type="submit"]:hover {
   filter: brightness(1.04);
@@ -321,12 +348,11 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   outline-offset: 2px;
 }
 .new-post-form button[type="submit"]:disabled {
-  opacity: .6;
+  opacity: 0.6;
   cursor: not-allowed;
   box-shadow: none;
 }
 
-/* Cartão de cada post */
 .posts .post {
   background-color: white;
   margin: 10px 0;
@@ -335,7 +361,6 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   box-shadow: 0 0 5px #ccc;
 }
 
-/* Cabeçalho do post (avatar + nome + data) */
 .post-header {
   display: flex;
   align-items: center;
@@ -343,7 +368,6 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   margin-bottom: 8px;
 }
 
-/* Avatar do autor do post */
 .post-avatar {
   width: 40px;
   height: 40px;
@@ -351,14 +375,15 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   object-fit: cover;
 }
 
-/* Área de curtidas (ícone + contador) */
+/* ========================================
+   SISTEMA DE CURTIDAS
+   ======================================== */
 .like-form {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-/* Botão do coração (com animação leve no hover) */
 .heart-btn {
   background: none;
   border: none;
@@ -366,31 +391,29 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   padding: 0;
   transition: transform 0.2s ease;
 }
-.heart-btn:hover { transform: scale(1.1); }
+.heart-btn:hover {
+  transform: scale(1.1);
+}
 
-/* Ícone do coração */
 .heart-icon {
   width: 28px;
   height: 28px;
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 
-/* Efeito “clique” (caso seja usado via JS) */
 .heart-btn.clicked .heart-icon {
   transform: scale(1.3);
   filter: drop-shadow(0 0 6px red);
 }
 
-/* Contador de likes */
 .like-count {
   font-size: 0.9rem;
   color: var(--cor-texto);
 }
 
 /* ========================================
-   CHAT (DM)
+   CHAT - BOTÃO FLUTUANTE
    ======================================== */
-/* Botão flutuante para abrir/fechar o chat */
 .chat-button {
   position: fixed;
   bottom: 20px;
@@ -402,106 +425,329 @@ main { flex: 1; padding: 20px; overflow-y: auto; }
   border-radius: 30px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 1001;
+  z-index: 1100;
 }
 
-/* Janela do chat (tamanho fixo controlado) */
+/* ========================================
+   CHAT BOX - CONTAINER PRINCIPAL
+   ======================================== */
+/* Chat abre ACIMA do botão (sem sobrepor) */
 .chat-box {
   position: fixed;
+  bottom: calc(
+    20px + 44px + 8px
+  ); /* 20px margem + ~44px altura do botão + 8px gap */
   right: 20px;
-  bottom: 70px;
-  width: 320px;          /* largura fixa */
-  height: 290px;         /* altura fixa (ajuste conforme preferir) */
+  width: 380px;
+  height: 500px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  background: #11111100;
-  color: #eee;
-  box-shadow: 0 8px 24px rgba(0,0,0,.3);
-  overflow: hidden;      /* impede expansão externa */
-  z-index: 999;
-}
-.chat-box.hidden { display: none; }
+  overflow: visible;
 
-/* Cabeçalho do chat (título + fechar) */
-.chat-header {
+  /* animação (scale+fade) - estado inicial */
+  transform-origin: bottom right;
+  transform: scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 160ms ease-out;
+}
+
+.chat-box.show {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.chat-box.hidden {
+  display: none;
+}
+
+.chat-box.hiding {
+  transform: scale(0.98);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 140ms ease-in, opacity 120ms ease-in;
+}
+
+/* Remover o X e centralizar header */
+.chat-close-btn {
+  display: none !important;
+}
+.chat-header-top {
+  justify-content: center;
+}
+
+.chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.chat-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+}
+.chat-header-top h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.chat-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  background: var(--cor-principal);
-  border-bottom: 1px solid var(--variacao);
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.chat-close-btn:hover {
+  background: #e0e0e0;
+  color: #333;
 }
 
-/* Botão fechar (X) do chat */
-.chat-close {
-  background: transparent;
-  color: #eee;
-  border: 0;
-  font-size: 18px;
+/* ========================================
+   CHAT DM - ESTRUTURA REACT
+   ======================================== */
+#dm-chat-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+}
+
+.chat-header {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.chat-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
   cursor: pointer;
 }
 
-/* Corpo do chat (lista de mensagens) */
-.chat-body {
+.chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 8px;
-  font-family: monospace;
-  font-size: 13px;
-  background: var(--cor-fundo);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #f8f9fa;
+  min-height: 0;
 }
 
-/* Linhas de mensagem (diferencio eu/parceiro por cor e alinhamento) */
-.msg-line { margin: 4px 0; }
-.msg-me { color: var(--chat-me-bg); text-align: right; }
-.msg-partner { color: var(--chat-partner-text); text-align: left; }
+.msg-line {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
 
-/* Rodapé do chat (input + enviar) */
-.chat-footer {
+.msg-me {
+  align-self: flex-end;
+  background: var(--cor-principal);
+  color: #fff;
+  border-bottom-right-radius: 2px;
+}
+
+.msg-partner {
+  align-self: flex-start;
+  background: #e9ecef;
+  color: #333;
+  border-bottom-left-radius: 2px;
+}
+
+.chat-input-area {
   display: flex;
-  gap: 6px;
-  padding: 8px;
-  border-top: 1px solid var(--variacao);
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+  flex-shrink: 0;
+}
+
+#chat-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#chat-input:focus {
+  border-color: var(--cor-principal);
+}
+
+#chat-send {
+  padding: 10px 20px;
+  background: var(--cor-principal);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#chat-send:hover:not(:disabled) {
   background: var(--cor-secundaria);
 }
-.chat-footer input {
-  flex: 1;
-  padding: 6px 8px;
-  background: var(--cor-principal);
-  color: white;
-  border: 1px solid var(--variacao);
-  border-radius: 6px;
-}
-.chat-footer input::placeholder { color: white; opacity: 0.6; font-style: italic; }
-.chat-footer button {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--variacao);
-  background: var(--cor-principal);
-  color: #eee;
-  cursor: pointer;
+#chat-send:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 /* ========================================
    RESPONSIVIDADE
    ======================================== */
+/* Tablets e celulares grandes */
+/* Tablets e celulares grandes */
 @media (max-width: 768px) {
-  * { box-sizing: border-box; }
-  .layout { flex-direction: column; height: auto; }
-  main { padding: 10px; }
+  .chat-box {
+    right: 10px;
+    bottom: calc(10px + 38px + 8px); /* acima do botão menor */
+    width: min(92vw, 360px);
+    height: 60vh;
+    border-radius: 12px;
+  }
 
-  /* Botão do chat mais compacto no mobile */
-  .chat-button { bottom: 10px; right: 10px; padding: 10px 16px; font-size: 14px; }
+  .chat-header-top {
+    padding: 10px 12px;
+  }
+  .chat-header {
+    padding: 10px;
+  }
+  .chat-select {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
 
-  /* Header mais contido */
-  .logo { height: 30px; }
-  .title-center { font-size: 20px; }
+  .chat-messages {
+    padding: 12px;
+    gap: 6px;
+  }
+  .msg-line {
+    font-size: 13px;
+    max-width: 85%;
+  }
 
-  /* Cards com menos respiro */
-  .new-post-form { padding: 12px; }
+  .chat-input-area {
+    padding: 10px;
+    gap: 6px;
+  }
+  #chat-input {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  #chat-send {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .chat-button {
+    bottom: 10px;
+    right: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
 }
+
+/* Celulares (até 540px) — tamanho do “quadrado vermelho” */
 @media (max-width: 540px) {
-  .new-post-form { padding: 12px; }
+  .chat-box {
+    /* mantém acima do botão */
+    right: 8px;
+    bottom: calc(8px + 38px + 6px);
+
+    /* tamanho compacto */
+    width: 300px; /* tente 300–320px conforme o print */
+    height: 420px; /* tente 400–440px */
+
+    /* se a tela for menor que 300px, não ultrapassar a viewport */
+    max-width: 92vw;
+    border-radius: 10px;
+  }
+
+  /* Ajustes internos para caber melhor */
+  .chat-header-top {
+    padding: 10px 12px;
+  }
+  .chat-header {
+    padding: 10px;
+  }
+  .chat-select {
+    font-size: 12.5px;
+    padding: 6px 10px;
+  }
+
+  .chat-messages {
+    padding: 10px;
+    gap: 6px;
+  }
+  .msg-line {
+    font-size: 12.5px;
+    max-width: 88%;
+  }
+
+  .chat-input-area {
+    padding: 10px;
+    gap: 6px;
+  }
+  #chat-input {
+    font-size: 12.5px;
+    padding: 8px 10px;
+  }
+  #chat-send {
+    font-size: 12.5px;
+    padding: 8px 12px;
+  }
+}
+
+/* Celulares muito pequenos (<= 380px) — garante que não estoure */
+@media (max-width: 380px) {
+  .chat-box {
+    width: 92vw; /* ocupa a largura disponível */
+    height: 65vh; /* altura proporcional quando a tela é muito estreita */
+    right: 6px;
+    bottom: calc(6px + 36px + 6px);
+  }
 }
