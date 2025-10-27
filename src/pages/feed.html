@@ -38,6 +38,16 @@
         </button>
       </div>
 
+       <div class="user-menu">
+        <!-- Botão de busca de usuários -->
+        <div class="search-users-wrapper" onclick="openUserSearchModal()">
+          <img
+            src="{{ url_for('static', filename='images/Lupa.png') }}"
+            alt="Buscar usuários"
+            class="icone-busca"
+          />
+        </div>
+
       <div class="user-menu">
         <!-- Sino de notificações com badge de não lidas -->
         <div class="bell-wrapper" onclick="openNotificationsModal()">
@@ -206,6 +216,36 @@
         <button id="mark-all-read" style="margin-top: 8px">
           Marcar todas como lidas
         </button>
+      </div>
+    </div>
+
+     <!-- Modal de busca de usuários -->
+    <div id="user-search-modal" class="hidden">
+      <div id="user-search-backdrop"></div>
+      <div
+        id="user-search-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="user-search-title"
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <h3 id="user-search-title">Explorar Usuários</h3>
+          <button id="user-search-close" aria-label="Fechar">×</button>
+        </div>
+        <div class="search-box">
+          <input
+            type="text"
+            id="user-search-input"
+            placeholder="Buscar por nome ou email..."
+          />
+          <div id="search-results" class="hidden"></div>
+        </div>
       </div>
     </div>
 

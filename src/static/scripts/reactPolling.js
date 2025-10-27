@@ -223,6 +223,10 @@ function ChatDM({ currentUserId }) {
         },
         placeholder: "Digite sua mensagem...",
         disabled: isSending,
+        autoComplete: "off",
+        autoCorrect: "off",
+        autoCapitalize: "off",
+        spellCheck: false,
       }),
       React.createElement(
         "button",
