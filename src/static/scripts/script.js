@@ -1,28 +1,31 @@
-/* ========================================
-   VARIÁVEIS GLOBAIS E ESTADO
-   ======================================== */
+// ========================================
+// SCRIPT PRINCIPAL DA APLICAÇÃO
+// ========================================
+// Controla navegação, modais, chat e interações gerais
 
-// Estado do chat DM (controle de abertura)
-let CHAT = {
-  open: false,
-};
-
-/* ========================================
-   INICIALIZAÇÃO
-   ======================================== */
+// ========================================
+// INICIALIZAÇÃO
+// ========================================
 document.addEventListener("DOMContentLoaded", () => {
-  // Começo no feed por padrão
-  showSection("inicio");
-
-  // Configuro os listeners do modal de notificações
+  // Define seção inicial baseada na URL
+  const currentPath = window.location.pathname;
+  
+  if (currentPath.startsWith("/perfil/")) {
+    showSection("perfil");
+  } else {
+    showSection("inicio");
+  }
+  
+  // Configura listeners dos modais
   setupNotificationModalListeners();
+  setupUserSearchModalListeners();
 });
 
+// Fecha dropdown ao clicar fora
 document.addEventListener("click", (e) => {
   const dropdown = document.getElementById("user-dropdown");
   const avatar = document.querySelector(".perfil-topo");
 
-  // Se o dropdown estiver visível e o clique for fora dele e fora do avatar
   if (dropdown && !dropdown.classList.contains("hidden")) {
     if (!dropdown.contains(e.target) && !avatar.contains(e.target)) {
       dropdown.classList.add("hidden");
@@ -30,11 +33,15 @@ document.addEventListener("click", (e) => {
   }
 });
 
-/* ========================================
-   NAVEGAÇÃO ENTRE SEÇÕES
-   ======================================== */
-// Mostra uma seção do app e esconde as demais
+// ========================================
+// NAVEGAÇÃO ENTRE SEÇÕES
+// ========================================
+
 function showSection(id) {
+  /**
+   * Mostra uma seção específica e esconde as demais
+   * @param {string} id - ID da seção a ser exibida
+   */
   const sections = document.querySelectorAll(".content");
   sections.forEach((sec) => sec.classList.remove("active"));
 
@@ -42,48 +49,59 @@ function showSection(id) {
   if (target) target.classList.add("active");
 }
 
-/* ========================================
-   MENU DO USUÁRIO
-   ======================================== */
-// Abre/fecha o dropdown do usuário
+// ========================================
+// MENU DO USUÁRIO
+// ========================================
+
 function toggleUserMenu() {
+  /**
+   * Abre/fecha o dropdown do menu do usuário
+   */
   const menu = document.getElementById("user-dropdown");
   if (!menu) return;
+  
   menu.classList.toggle("hidden");
 }
 
-// Força logout via redirecionamento (previne envio de form, se houver)
 function logout() {
+  /**
+   * Faz logout e redireciona para a página inicial
+   */
   try {
     event?.preventDefault?.();
   } catch (_) {}
+  
   window.location.href = "/logout";
 }
 
-/* ========================================
-   CHAT DM - CONTROLE PRINCIPAL
-   ======================================== */
-// Abre/fecha a caixa de chat
+// ========================================
+// CHAT DM - CONTROLE DE VISIBILIDADE
+// ========================================
+
 function toggleChat() {
+  /**
+   * Abre/fecha a caixa de chat com animação
+   */
   const box = document.getElementById("chat-box");
   const isHidden = box.classList.contains("hidden");
 
   if (isHidden) {
-    // mostrar
+    // Mostra o chat
     box.classList.remove("hidden", "hiding");
-    void box.offsetWidth; // reflow para transição
+    void box.offsetWidth; // Force reflow para animação
     box.classList.add("show");
 
-    // foca no input e desce para o fim após a animação
+    // Foca no input e rola para o fim
     setTimeout(() => {
       document.getElementById("chat-input")?.focus();
       const container = document.querySelector("#dm-chat-root .chat-messages");
       if (container) container.scrollTop = container.scrollHeight;
     }, 200);
   } else {
-    // esconder
+    // Esconde o chat
     box.classList.remove("show");
     box.classList.add("hiding");
+    
     setTimeout(() => {
       box.classList.add("hidden");
       box.classList.remove("hiding");
@@ -91,25 +109,15 @@ function toggleChat() {
   }
 }
 
-/* ========================================
-   NOTIFICAÇÕES - AÇÕES
-   ======================================== */
-// Busca e renderiza notificações (chamada pelo React)
-async function fetchAndRenderNotifications() {
-  try {
-    const res = await fetch("/api/notifications");
-    if (!res.ok) return;
+// ========================================
+// NOTIFICAÇÕES - CONTROLE DO BADGE
+// ========================================
 
-    const data = await res.json();
-    updateNotificationBadge(data.unread || 0);
-    renderNotificationList(data.items || []);
-  } catch (e) {
-    // Silencioso
-  }
-}
-
-// Mostra/esconde o badge de não lidas
 function updateNotificationBadge(count) {
+  /**
+   * Atualiza o badge de notificações não lidas
+   * @param {number} count - Número de notificações não lidas
+   */
   const badge = document.getElementById("notif-badge");
   if (!badge) return;
 
@@ -122,64 +130,42 @@ function updateNotificationBadge(count) {
   }
 }
 
-// Renderiza a lista do modal (limito às 3 mais recentes)
-function renderNotificationList(items) {
-  const list = document.getElementById("notifications-list");
-  if (!list) return;
+// ========================================
+// NOTIFICAÇÕES - AÇÕES
+// ========================================
 
-  list.innerHTML = "";
-
-  if (items.length === 0) {
-    list.innerHTML = '<p class="empty">Não há notificações.</p>';
-    return;
-  }
-
-  const visible = items.slice(0, 3);
-  visible.forEach((n) => {
-    const div = document.createElement("div");
-    div.className = "notificacao";
-
-    const isUnread = n.read === "0";
-    div.style.fontWeight = isUnread ? "600" : "400";
-
-    const ts = n.timestamp || "";
-    const text = escapeHtml(n.text || "Nova mensagem");
-
-    div.innerHTML = `<p>${text} <small style="opacity:.7">${ts}</small></p>`;
-    list.appendChild(div);
-  });
-
-  // Se tiver mais que 3, posso mostrar um indicador simples (opcional)
-  if (items.length > 3) {
-    const more = document.createElement("div");
-    more.style.textAlign = "center";
-    more.style.padding = "6px 0 0";
-    list.appendChild(more);
-  }
-}
-
-// Marca todas as notificações como lidas e atualiza UI
 async function markAllRead() {
+  /**
+   * Marca todas as notificações como lidas
+   */
   const btn = document.getElementById("mark-all-read");
   if (btn) btn.disabled = true;
 
   try {
     const res = await fetch("/api/notifications/mark_all_read", {
       method: "POST",
+      credentials: "same-origin",
     });
+    
     if (!res.ok) {
       console.error("Falha ao marcar como lidas");
       return;
     }
 
-    await fetchAndRenderNotifications();
+    // Atualização otimista da UI
+    updateNotificationBadge(0);
 
-    // Zera badge visualmente para dar feedback imediato
-    const badge = document.getElementById("notif-badge");
-    if (badge) {
-      badge.textContent = "";
-      badge.classList.remove("show");
+    // Limpa estado global se existir
+    if (window.NOTIF_STATE) {
+      window.NOTIF_STATE.unread = 0;
+      window.NOTIF_STATE.items = [];
+      if (typeof window.NOTIF_STATE.makeKey === "function") {
+        window.NOTIF_STATE.lastKey = window.NOTIF_STATE.makeKey([]);
+      }
     }
+
+    // Dispara evento para o React atualizar
+    window.dispatchEvent(new Event("notifications-updated"));
   } catch (e) {
     console.error("Erro ao marcar notificações como lidas:", e);
   } finally {
@@ -187,31 +173,38 @@ async function markAllRead() {
   }
 }
 
-/* ========================================
-   MODAL DE NOTIFICAÇÕES
-   ======================================== */
-// Abre o modal e foca no botão de fechar para acessibilidade
+// ========================================
+// MODAL DE NOTIFICAÇÕES
+// ========================================
+
 function openNotificationsModal() {
+  /**
+   * Abre o modal de notificações
+   */
   const modal = document.getElementById("notifications-modal");
   if (!modal) return;
 
   modal.classList.remove("hidden");
-  fetchAndRenderNotifications();
 
+  // Foca no botão de fechar para acessibilidade
   const closeBtn = document.getElementById("notifications-modal-close");
   closeBtn?.focus();
 }
 
-// Fecha o modal
 function closeNotificationsModal() {
+  /**
+   * Fecha o modal de notificações
+   */
   const modal = document.getElementById("notifications-modal");
   if (!modal) return;
 
   modal.classList.add("hidden");
 }
 
-// Configura interações do modal (fechar, backdrop, ESC, etc.)
 function setupNotificationModalListeners() {
+  /**
+   * Configura todos os listeners do modal de notificações
+   */
   const backdrop = document.getElementById("notifications-modal-backdrop");
   const closeBtn = document.getElementById("notifications-modal-close");
   const content = document.getElementById("notifications-modal-content");
@@ -236,6 +229,7 @@ function setupNotificationModalListeners() {
   document.addEventListener("keydown", (e) => {
     const modal = document.getElementById("notifications-modal");
     const isOpen = modal && !modal.classList.contains("hidden");
+    
     if (isOpen && e.key === "Escape") {
       closeNotificationsModal();
     }
@@ -245,18 +239,20 @@ function setupNotificationModalListeners() {
   content?.addEventListener("click", (e) => e.stopPropagation());
 }
 
-/* ========================================
-   EXPLORAÇÃO DE USUÁRIOS - BUSCA
-======================================== */
+// ========================================
+// BUSCA DE USUÁRIOS - VARIÁVEIS
+// ========================================
 
-// Variável para controlar o debounce da busca
-let searchTimeout = null;
+let searchTimeout = null; // Controle de debounce
 
-/**
- * Inicializa a funcionalidade de busca de usuários
- * Chame esta função no DOMContentLoaded
- */
+// ========================================
+// BUSCA DE USUÁRIOS - INICIALIZAÇÃO
+// ========================================
+
 function initUserSearch() {
+  /**
+   * Inicializa a funcionalidade de busca de usuários
+   */
   const searchInput = document.getElementById("user-search-input");
   const resultsContainer = document.getElementById("search-results");
 
@@ -266,12 +262,12 @@ function initUserSearch() {
   searchInput.addEventListener("input", (e) => {
     const query = e.target.value.trim();
 
-    // Limpa o timeout anterior
+    // Limpa timeout anterior
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
 
-    // Se o campo está vazio, esconde os resultados
+    // Se vazio, esconde resultados
     if (query.length === 0) {
       resultsContainer.classList.add("hidden");
       resultsContainer.innerHTML = "";
@@ -289,14 +285,14 @@ function initUserSearch() {
     }, 300);
   });
 
-  // Fecha os resultados ao clicar fora
+  // Fecha resultados ao clicar fora
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".search-box")) {
       resultsContainer.classList.add("hidden");
     }
   });
 
-  // Reabre resultados ao focar no input (se houver resultados)
+  // Reabre resultados ao focar no input
   searchInput.addEventListener("focus", () => {
     if (resultsContainer.innerHTML && searchInput.value.trim()) {
       resultsContainer.classList.remove("hidden");
@@ -304,25 +300,42 @@ function initUserSearch() {
   });
 }
 
-/**
- * Busca usuários na API
- * @param {string} query - Termo de busca
- */
+// ========================================
+// BUSCA DE USUÁRIOS - BUSCA
+// ========================================
+
 async function searchUsers(query) {
+  /**
+   * Busca usuários na API e renderiza resultados
+   * @param {string} query - Termo de busca
+   */
   const resultsContainer = document.getElementById("search-results");
   if (!resultsContainer) return;
 
   try {
-    const response = await fetch("/api/users");
+    const response = await fetch("/api/users", { credentials: "same-origin" });
+    
     if (!response.ok) throw new Error("Erro ao buscar usuários");
+
+    const ct = response.headers.get("content-type") || "";
+    if (!ct.includes("application/json")) {
+      console.warn(
+        "Resposta não-JSON (possível redirect). Status:",
+        response.status
+      );
+      return;
+    }
 
     const data = await response.json();
     const allUsers = data.users || [];
 
-    // Filtra os usuários cujo username contém o termo buscado
-    const filtered = allUsers.filter((user) =>
-      user.username.toLowerCase().includes(query.toLowerCase())
-    );
+    // Filtra por username OU email
+    const q = query.toLowerCase();
+    const filtered = allUsers.filter((user) => {
+      const u = (user.username || "").toLowerCase();
+      const e = (user.email || "").toLowerCase();
+      return u.includes(q) || e.includes(q);
+    });
 
     renderSearchResults(filtered);
   } catch (error) {
@@ -332,11 +345,11 @@ async function searchUsers(query) {
   }
 }
 
-/**
- * Renderiza os resultados da busca
- * @param {Array} users - Lista de usuários encontrados
- */
 function renderSearchResults(users) {
+  /**
+   * Renderiza os resultados da busca
+   * @param {Array} users - Lista de usuários encontrados
+   */
   const resultsContainer = document.getElementById("search-results");
   if (!resultsContainer) return;
 
@@ -347,7 +360,7 @@ function renderSearchResults(users) {
     return;
   }
 
-  // Limpa o container
+  // Limpa container
   resultsContainer.innerHTML = "";
 
   // Renderiza cada usuário
@@ -357,54 +370,62 @@ function renderSearchResults(users) {
   });
 }
 
-/**
- * Cria um elemento HTML para um usuário nos resultados
- * @param {Object} user - Dados do usuário
- * @returns {HTMLElement}
- */
 function createUserResultItem(user) {
+  /**
+   * Cria um elemento HTML para um usuário nos resultados
+   * @param {Object} user - Dados do usuário
+   * @returns {HTMLElement}
+   */
   const item = document.createElement("div");
   item.className = "user-result-item";
-
+  
   item.innerHTML = `
     <div class="user-result-info">
       <div class="user-result-name">@${escapeHtml(user.username)}</div>
+      <div class="user-result-email">${escapeHtml(user.email)}</div>
     </div>
   `;
 
+  // Ao clicar, vai para o perfil
   item.addEventListener("click", () => {
+    closeUserSearchModal();
     goToUserProfile(user.id);
   });
 
   return item;
 }
 
-/**
- * Navega para o perfil de um usuário
- * @param {number} userId - ID do usuáriopython app.py
- *
- */
-function goToUserProfile(userId) {
-  // Redireciona para a página de perfil do usuário
-  // Ajuste a rota conforme seu backend
-  window.location.href = `/perfil/${userId}`;
-}
+// ========================================
+// MODAL DE BUSCA DE USUÁRIOS
+// ========================================
 
 function openUserSearchModal() {
+  /**
+   * Abre o modal de busca de usuários
+   */
   const modal = document.getElementById("user-search-modal");
   if (!modal) return;
+  
   modal.classList.remove("hidden");
   initUserSearch();
+  
   document.getElementById("user-search-close")?.focus();
 }
 
 function closeUserSearchModal() {
+  /**
+   * Fecha o modal de busca de usuários
+   */
   const modal = document.getElementById("user-search-modal");
   if (!modal) return;
+  
   modal.classList.add("hidden");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function setupUserSearchModalListeners() {
+  /**
+   * Configura listeners do modal de busca
+   */
   const closeBtn = document.getElementById("user-search-close");
   const backdrop = document.getElementById("user-search-backdrop");
   const content = document.getElementById("user-search-content");
@@ -413,18 +434,46 @@ document.addEventListener("DOMContentLoaded", () => {
   backdrop?.addEventListener("click", closeUserSearchModal);
   content?.addEventListener("click", (e) => e.stopPropagation());
 
+  // Fecha com ESC
   document.addEventListener("keydown", (e) => {
     const modal = document.getElementById("user-search-modal");
     const isOpen = modal && !modal.classList.contains("hidden");
-    if (isOpen && e.key === "Escape") closeUserSearchModal();
+    
+    if (isOpen && e.key === "Escape") {
+      closeUserSearchModal();
+    }
   });
-});
+}
 
-/* ========================================
-   UTILITÁRIOS
-   ======================================== */
-// Sanitiza texto para evitar XSS básico em inserções de HTML
+// ========================================
+// NAVEGAÇÃO DE PERFIS
+// ========================================
+
+function goToMyProfile() {
+  /**
+   * Redireciona para o próprio perfil
+   */
+  window.location.href = "/perfil";
+}
+
+function goToUserProfile(userId) {
+  /**
+   * Redireciona para o perfil de um usuário específico
+   * @param {number|string} userId - ID do usuário
+   */
+  window.location.href = `/perfil/${userId}`;
+}
+
+// ========================================
+// UTILITÁRIOS
+// ========================================
+
 function escapeHtml(str) {
+  /**
+   * Sanitiza texto para evitar XSS
+   * @param {string} str - Texto a ser sanitizado
+   * @returns {string} Texto seguro
+   */
   return String(str)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")

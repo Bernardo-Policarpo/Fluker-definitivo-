@@ -4,16 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FLUKER</title>
+
+    <!-- Favicon -->
     <link
       rel="shortcut icon"
       href="{{ url_for('static', filename='images/Logo-Fluker.png') }}"
       type="image/x-icon"
     />
+
+    <!-- CSS principal -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles/styleFeed.css') }}"
     />
-    <!-- React 18 via CDN (DEV) -->
+
+    <!-- React 18 via CDN (ambiente de desenvolvimento) -->
     <script
       crossorigin
       src="https://unpkg.com/react@18/umd/react.development.js"
@@ -25,21 +30,25 @@
   </head>
 
   <body>
-    <!-- Cabeçalho principal: logo, título e menu do usuário -->
+    <!-- Cabeçalho: logo, atalho para home, busca, notificações e menu do usuário -->
     <header>
       <div class="header-left">
+        <!-- Logo da aplicação -->
         <img
           src="{{ url_for('static', filename='images/logo.png') }}"
           alt="Logo FLUKER"
           class="logo"
         />
-        <button class="title-center" onclick="showSection('inicio')">
+
+        <!-- Título central que navega para /home -->
+        <button class="title-center" onclick="window.location.href = '/home'">
           FLUKER
         </button>
       </div>
 
-       <div class="user-menu">
-        <!-- Botão de busca de usuários -->
+      <!-- Área de ações do usuário: busca, notificações e perfil -->
+      <div class="user-menu">
+        <!-- Botão para abrir modal de busca de usuários -->
         <div class="search-users-wrapper" onclick="openUserSearchModal()">
           <img
             src="{{ url_for('static', filename='images/Lupa.png') }}"
@@ -48,8 +57,7 @@
           />
         </div>
 
-      <div class="user-menu">
-        <!-- Sino de notificações com badge de não lidas -->
+        <!-- Sino de notificações com indicador de não lidas -->
         <div class="bell-wrapper" onclick="openNotificationsModal()">
           <img
             src="{{ url_for('static', filename='images/sino.png') }}"
@@ -59,7 +67,7 @@
           <span id="notif-badge" class="notif-badge"></span>
         </div>
 
-        <!-- Avatar do usuário com dropdown -->
+        <!-- Avatar com dropdown de ações (perfil/sair) -->
         <img
           src="{{ url_for('static', filename='images/perfil.jpg') }}"
           alt="Perfil"
@@ -68,18 +76,21 @@
         />
         <div class="menu-dropdown hidden" id="user-dropdown">
           <ul>
-            <li onclick="showSection('perfil')">Perfil</li>
+            <li onclick="goToMyProfile()">Meu Perfil</li>
             <li onclick="logout()">Sair</li>
           </ul>
         </div>
       </div>
     </header>
 
+    <!-- Layout principal -->
     <div class="layout">
       <main>
-        <!-- Seção de perfil (ainda em construção) -->
+        <!-- Seção de perfil (mostra meu perfil ou o de outro usuário) -->
         <section id="perfil" class="content">
           <div class="profile">
+            {% if profile_user %}
+            <!-- Perfil de outro usuário -->
             <div class="avatar">
               <img
                 src="{{ url_for('static', filename='images/perfil.jpg') }}"
@@ -87,18 +98,82 @@
                 class="perfil-principal"
               />
             </div>
+
+            <!-- Nome do usuário visitado -->
+            <h2>{{ profile_user.username }}</h2>
+
+            <!-- Estado de amizade e ações relacionadas (se não for meu perfil) -->
+            {% if not is_my_profile %} {% if are_we_friends %}
+            <p class="friend-status">✅ Amigos</p>
+            {% elif has_pending_request %}
+            <p class="friend-status">⏳ Solicitação enviada</p>
+            {% else %}
+            <form
+              action="{{ url_for('add_friend', user_id=profile_user.id) }}"
+              method="POST"
+            >
+              <button type="submit" class="add-friend-btn">
+                Adicionar Amigo
+              </button>
+            </form>
+            {% endif %} {% endif %}
+
+            <!-- Últimos 3 posts do usuário visitado -->
+            <h3>Últimos 3 posts:</h3>
             <div class="posts">
-              <div class="post">Post 1</div>
-              <div class="post">Post 2</div>
-              <div class="post">Post 3</div>
+              {% if recent_posts %} {% for post in recent_posts %}
+              <div class="post">
+                <div class="post-header">
+                  <small>{{ post.timestamp_display }}</small>
+                </div>
+                <p>{{ post.content }}</p>
+                <div class="post-stats">
+                  <span>❤️ {{ post.likes }} curtidas</span>
+                </div>
+              </div>
+              {% endfor %} {% else %}
+              <p class="empty">Nenhum post ainda.</p>
+              {% endif %}
             </div>
+
+            {% else %}
+            <!-- Meu perfil -->
+            <div class="avatar">
+              <img
+                src="{{ url_for('static', filename='images/perfil.jpg') }}"
+                alt="Foto de perfil"
+                class="perfil-principal"
+              />
+            </div>
+
+            <!-- Meu nome de usuário -->
+            <h2>{{ username }}</h2>
+
+            <!-- Meus últimos 3 posts -->
+            <h3>Meus últimos 3 posts:</h3>
+            <div class="posts">
+              {% if recent_posts %} {% for post in recent_posts %}
+              <div class="post">
+                <div class="post-header">
+                  <small>{{ post.timestamp_display }}</small>
+                </div>
+                <p>{{ post.content }}</p>
+                <div class="post-stats">
+                  <span>❤️ {{ post.likes }} curtidas</span>
+                </div>
+              </div>
+              {% endfor %} {% else %}
+              <p class="empty">Você ainda não fez nenhum post.</p>
+              {% endif %}
+            </div>
+            {% endif %}
           </div>
         </section>
 
-        <!-- Feed principal: formulário de novo post + lista de posts -->
+        <!-- Feed inicial: formulário de novo post + lista de posts -->
         <section id="inicio" class="content active">
           <div class="feed-container">
-            <!-- Form de novo post: envia para /postar (POST) -->
+            <!-- Formulário para criar um novo post (POST em /postar) -->
             <form
               action="{{ url_for('postar') }}"
               method="POST"
@@ -115,11 +190,11 @@
               </div>
             </form>
 
-            <!-- Lista de posts vinda do backend -->
+            <!-- Lista de posts renderizada a partir dos dados do backend -->
             <div class="posts">
               {% if posts %} {% for p in posts %}
               <div class="post">
-                <!-- Cabeçalho do post: avatar, nome e timestamp -->
+                <!-- Cabeçalho do post: avatar, autor e timestamp -->
                 <div class="post-header">
                   <img
                     src="{{ url_for('static', filename='images/perfil.jpg') }}"
@@ -128,18 +203,18 @@
                   />
                   <div>
                     <h3>{{ p.author_name }}</h3>
-                    <small>{{ p.timestamp_display}}</small>
+                    <small>{{ p.timestamp_display }}</small>
                   </div>
                 </div>
 
                 <!-- Conteúdo do post -->
                 <p>{{ p.content }}</p>
 
-                <!-- Verifica se o usuário atual já curtiu este post -->
+                <!-- Cálculo do estado "curtido" pelo usuário atual -->
                 {% set liked = (p.get('likes_by') or '') and (user_id in
                 (p.get('likes_by').split(';'))) %}
 
-                <!-- Botão de curtir: chama toggleCurtida() que faz POST em /curtir/<id> -->
+                <!-- Raiz do widget de like (React/JS consome os data-*) -->
                 <div
                   class="like-widget-root"
                   data-post-id="{{ p.id }}"
@@ -154,46 +229,46 @@
           </div>
         </section>
 
-        <!-- Seção de configurações (comentada por enquanto)
-      <section id="configuracoes" class="content">
-        <div class="configuracoes-container">
-          <div class="config-item">
-            <p><strong>Privacidade e Visibilidade</strong></p>
+        <!-- Seção de configurações (mantida comentada para uso futuro)
+        <section id="configuracoes" class="content">
+          <div class="configuracoes-container">
+            <div class="config-item">
+              <p><strong>Privacidade e Visibilidade</strong></p>
+            </div>
+            <div class="config-item">
+              <p><strong>Segurança e Autenticação</strong></p>
+            </div>
+            <div class="config-item">
+              <p><strong>Conteúdo e Experiência</strong></p>
+            </div>
+            <div class="config-item">
+              <p><strong>Bloqueios e Moderação</strong></p>
+            </div>
           </div>
-          <div class="config-item">
-            <p><strong>Segurança e Autenticação</strong></p>
-          </div>
-          <div class="config-item">
-            <p><strong>Conteúdo e Experiência</strong></p>
-          </div>
-          <div class="config-item">
-            <p><strong>Bloqueios e Moderação</strong></p>
-          </div>
-        </div>
-      </section>
-      --></main>
+        </section>
+        -->
+      </main>
     </div>
 
-    <!-- Botão flutuante para abrir/fechar o chat DM -->
+    <!-- Botão flutuante para abrir/fechar o chat (DM) -->
     <button class="chat-button" onclick="toggleChat()">CHAT</button>
 
-    <!-- Caixa de chat (DM) -->
+    <!-- Caixa/Modal do chat DM (conteúdo é renderizado via React) -->
     <div id="chat-box" class="chat-box hidden">
       <div class="chat-wrapper">
         <div class="chat-header-top">
           <h3>DM</h3>
-          <button onclick="toggleChat()" class="chat-close-btn">✕</button>
         </div>
         <div
           id="dm-chat-root"
           data-current-user-id="{{ session.get('user_id') }}"
         >
-          <!-- React vai renderizar aqui -->
+          <!-- React renderiza aqui -->
         </div>
       </div>
     </div>
 
-    <!-- Modal de notificações -->
+    <!-- Modal de notificações (lista e ações) -->
     <div id="notifications-modal" class="hidden">
       <div id="notifications-modal-backdrop"></div>
       <div
@@ -219,7 +294,7 @@
       </div>
     </div>
 
-     <!-- Modal de busca de usuários -->
+    <!-- Modal de busca de usuários -->
     <div id="user-search-modal" class="hidden">
       <div id="user-search-backdrop"></div>
       <div
@@ -238,8 +313,11 @@
           <h3 id="user-search-title">Explorar Usuários</h3>
           <button id="user-search-close" aria-label="Fechar">×</button>
         </div>
+
+        <!-- Campo de busca e área de resultados -->
         <div class="search-box">
           <input
+            autocomplete="off"
             type="text"
             id="user-search-input"
             placeholder="Buscar por nome ou email..."
@@ -249,14 +327,15 @@
       </div>
     </div>
 
-    <!-- Exponho o ID do usuário atual para o JS saber quem é "eu" nas mensagens -->
+    <!-- Exposição controlada do ID do usuário atual para uso em JS -->
     <script>
       window.CURRENT_USER_ID = "{{ session.get('user_id') }}";
     </script>
-    <!-- Seu JS legado (se existir) -->
+
+    <!-- Scripts legados do projeto -->
     <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
 
-    <!-- Seu React em JS puro -->
+    <!-- Scripts React/JS da aplicação (ex.: polling para atualizações) -->
     <script src="{{ url_for('static', filename='scripts/reactPolling.js') }}"></script>
   </body>
 </html>
