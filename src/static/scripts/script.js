@@ -481,3 +481,170 @@ function escapeHtml(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+// ========================================
+// MODAL POSTS E AÇÕES
+// ========================================
+
+function OpenModalPosts(postId, authorId) {
+  /**
+   * Abre o modal de opções do post.
+   * Só mostra botões de ação se o post for do usuário atual.
+   */
+  const modal = document.getElementById(`posts-modal-${postId}`);
+  const actionButtons = document.getElementById(`action-buttons-${postId}`);
+  const modifyForm = document.getElementById(`modify-form-${postId}`);
+  
+  if (!modal) return;
+
+  // Esconde o modal de modificação e mostra os botões de ação (estado inicial)
+  modifyForm?.classList.add("hidden");
+  actionButtons?.classList.remove("hidden");
+
+  // Verifica se o post é do usuário atual
+  const isMyPost = String(authorId) === String(window.CURRENT_USER_ID);
+
+  // Se não for meu post, não mostra as opções de ação
+  if (actionButtons) {
+    actionButtons.style.display = isMyPost ? 'flex' : 'none';
+  }
+
+  modal.classList.remove("hidden");
+  modal.classList.add("show");
+}
+
+function CloseModalPosts(postId) {
+  /**
+   * Fecha o modal de opções do post.
+   */
+  const modal = document.getElementById(`posts-modal-${postId}`);
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("show");
+}
+
+function prepareModify(postId, currentContent) {
+  /**
+   * Prepara a interface para modificação: esconde botões, mostra textarea.
+   */
+  const actionButtons = document.getElementById(`action-buttons-${postId}`);
+  const modifyForm = document.getElementById(`modify-form-${postId}`);
+  const textarea = document.getElementById(`modify-content-${postId}`);
+
+  actionButtons?.classList.add("hidden");
+  modifyForm?.classList.remove("hidden");
+  
+  // Preenche a textarea com o conteúdo atual e foca
+  if (textarea) {
+    textarea.value = currentContent;
+    textarea.focus();
+  }
+}
+
+function cancelModify(postId) {
+  /**
+   * Cancela a modificação: esconde textarea, mostra botões.
+   */
+  const actionButtons = document.getElementById(`action-buttons-${postId}`);
+  const modifyForm = document.getElementById(`modify-form-${postId}`);
+  
+  modifyForm?.classList.add("hidden");
+  actionButtons?.classList.remove("hidden");
+}
+
+async function deletePost(postId) {
+  /**
+   * Envia requisição DELETE para excluir o post.
+   */
+  if (!confirm("Tem certeza que deseja excluir este post? Esta ação é irreversível.")) {
+    return;
+  }
+  
+  CloseModalPosts(postId);
+
+  try {
+    const response = await fetch(`/api/delete_post/${postId}`, {
+      method: "DELETE",
+      credentials: "same-origin",
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      alert("Post excluído com sucesso!");
+      // Remove o post da UI
+      const postElement = document.querySelector(`.posts .post:has(.post-options-btn[onclick*="OpenModalPosts(${postId}"])`);
+      if (postElement) {
+        postElement.remove();
+      } else {
+        // Fallback: recarrega a página se não conseguir remover o elemento
+        window.location.reload();
+      }
+    } else {
+      alert(`Erro ao excluir post: ${data.message || 'Erro desconhecido'}`);
+    }
+  } catch (error) {
+    console.error("Erro na exclusão:", error);
+    alert("Ocorreu um erro de rede ao tentar excluir o post.");
+  }
+}
+
+async function modifyPost(event, postId) {
+  /**
+   * Envia requisição PUT para modificar o conteúdo do post.
+   */
+  event.preventDefault();
+  
+  const textarea = document.getElementById(`modify-content-${postId}`);
+  const newContent = textarea?.value.trim();
+  
+  if (!newContent) {
+    alert("O conteúdo do post não pode ser vazio.");
+    return;
+  }
+  
+  CloseModalPosts(postId);
+
+  try {
+    const response = await fetch(`/api/modify_post/${postId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ content: newContent }),
+      credentials: "same-origin",
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      alert("Post modificado com sucesso!");
+      
+      // Atualiza o conteúdo na UI
+      const contentElement = document.getElementById(`post-content-${postId}`);
+      const timestampElement = document.getElementById(`timestamp-${postId}`);
+      
+      if (contentElement) {
+        contentElement.textContent = newContent;
+      }
+      
+      // O backend atualiza o timestamp, mas não retorna o formato de display.
+      // Apenas adicionamos um indicador de que foi modificado, ou recarregamos.
+      if (timestampElement) {
+        // Simplesmente recarrega para pegar o timestamp correto do backend
+        window.location.reload();
+      } else {
+        // Se não tiver o elemento de timestamp, pelo menos garante o conteúdo
+        cancelModify(postId);
+      }
+      
+    } else {
+      alert(`Erro ao modificar post: ${data.message || 'Erro desconhecido'}`);
+    }
+  } catch (error) {
+    console.error("Erro na modificação:", error);
+    alert("Ocorreu um erro de rede ao tentar modificar o post.");
+  }
+}
+

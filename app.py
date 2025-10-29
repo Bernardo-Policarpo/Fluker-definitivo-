@@ -82,6 +82,33 @@ def ensure_friends_csv():
             csv.writer(f).writerow(['user1_id', 'user2_id', 'status', 'timestamp'])
 
 # ========================================
+# UTILITÁRIOS DE POSTS
+# ========================================
+
+def load_posts():
+    """Carrega todos os posts do CSV"""
+    ensure_posts_csv()
+    with open(POSTS_PATH, 'r', newline='', encoding='utf-8-sig') as f:
+        reader = csv.DictReader(f)
+        posts = list(reader)
+        fieldnames = list(reader.fieldnames or ['id', 'author_id', 'author_name', 'timestamp', 'content', 'likes', 'likes_by'])
+        
+        # Garante que todos os posts têm todas as colunas
+        for p in posts:
+            for field in fieldnames:
+                if field not in p:
+                    p[field] = ''
+        
+        return posts, fieldnames
+
+def save_posts(posts, fieldnames):
+    """Salva a lista completa de posts de volta no CSV"""
+    with open(POSTS_PATH, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(posts)
+
+# ========================================
 # GERADORES DE ID
 # ========================================
 
@@ -873,6 +900,66 @@ def api_send():
     return jsonify({'ok': True, 'id': mid, 'timestamp': now})
 
 # ========================================
+# API - POSTS
+# ========================================
+
+@app.delete('/api/delete_post/<int:post_id>')
+@login_required
+def api_delete_post(post_id):
+    """Exclui um post pelo ID (apenas se for do autor)"""
+    me = str(session.get('user_id'))
+    
+    # Carrega posts
+    posts, fieldnames = load_posts()
+    
+    initial_count = len(posts)
+    
+    # Filtra posts, mantendo apenas os que NÃO são o post_id OU que não pertencem ao usuário atual
+    posts = [
+        p for p in posts
+        if not (p.get('id') == str(post_id) and p.get('author_id') == me)
+    ]
+    
+    # Verifica se houve exclusão
+    if len(posts) < initial_count:
+        save_posts(posts, fieldnames)
+        return jsonify({'success': True, 'message': 'Post excluído com sucesso'}), 200
+    
+    # Se chegou aqui, ou o post não existe, ou não pertence ao usuário
+    return jsonify({'success': False, 'message': 'Post não encontrado ou você não tem permissão para excluí-lo'}), 403
+
+@app.put('/api/modify_post/<int:post_id>')
+@login_required
+def api_modify_post(post_id):
+    """Modifica o conteúdo de um post pelo ID (apenas se for do autor)"""
+    me = str(session.get('user_id'))
+    data = request.get_json(silent=True) or {}
+    new_content = str(data.get('content', '')).strip()
+    
+    if not new_content:
+        return jsonify({'success': False, 'message': 'Conteúdo do post não pode ser vazio'}), 400
+    
+    # Carrega posts
+    posts, fieldnames = load_posts()
+    updated = False
+    
+    # Busca e atualiza o post
+    for p in posts:
+        if p.get('id') == str(post_id) and p.get('author_id') == me:
+            p['content'] = new_content
+            # Atualiza o timestamp para refletir a modificação
+            p['timestamp'] = datetime.now(timezone.utc).isoformat()
+            updated = True
+            break
+            
+    if updated:
+        save_posts(posts, fieldnames)
+        return jsonify({'success': True, 'message': 'Post modificado com sucesso', 'new_content': new_content}), 200
+    
+    # Se chegou aqui, ou o post não existe, ou não pertence ao usuário
+    return jsonify({'success': False, 'message': 'Post não encontrado ou você não tem permissão para modificá-lo'}), 403
+
+# ========================================
 # API - CURTIDAS
 # ========================================
 
@@ -880,24 +967,22 @@ def api_send():
 @login_required
 def api_post_likes():
     """Retorna estado de curtidas de todos os posts (para sincronização)"""
-    ensure_posts_csv()
+    posts, _ = load_posts()
     result = {}
     
-    with open(POSTS_PATH, 'r', newline='', encoding='utf-8-sig') as f:
-        reader = csv.DictReader(f)
-        for r in reader:
-            pid = r.get('id')
-            if not pid:
-                continue
-            
-            likes_by = (r.get('likes_by') or '').strip()
-            
-            try:
-                likes = int(r.get('likes') or 0)
-            except:
-                likes = 0
-            
-            result[pid] = {'likes': likes, 'likes_by': likes_by}
+    for r in posts:
+        pid = r.get('id')
+        if not pid:
+            continue
+        
+        likes_by = (r.get('likes_by') or '').strip()
+        
+        try:
+            likes = int(r.get('likes') or 0)
+        except:
+            likes = 0
+        
+        result[pid] = {'likes': likes, 'likes_by': likes_by}
     
     return jsonify(result)
 
@@ -908,22 +993,8 @@ def api_toggle_like(post_id):
     ensure_posts_csv()
     me = str(session.get('user_id'))
 
-    # Lê todos os posts
-    with open(POSTS_PATH, 'r', newline='', encoding='utf-8-sig') as f:
-        reader = csv.DictReader(f)
-        posts = list(reader)
-        fieldnames = list(reader.fieldnames or [])
-
-    # Garante colunas necessárias
-    required_fields = ['id', 'author_id', 'author_name', 'timestamp', 'content', 'likes', 'likes_by']
-    for rf in required_fields:
-        if rf not in fieldnames:
-            fieldnames.append(rf)
-    
-    for p in posts:
-        for rf in required_fields:
-            if rf not in p:
-                p[rf] = ''
+    # Carrega posts
+    posts, fieldnames = load_posts()
 
     post_author_id = None
     liked_now = False
@@ -931,27 +1002,27 @@ def api_toggle_like(post_id):
 
     # Processa toggle
     for p in posts:
-        if int(p['id']) == post_id:
-            post_author_id = p.get('author_id')
-            likes_by = [x for x in (p.get('likes_by') or '').split(';') if x]
-            
-            if me in likes_by:
-                likes_by = [x for x in likes_by if x != me]
-                liked_now = False
-            else:
-                likes_by.append(me)
-                liked_now = True
-            
-            p['likes_by'] = ';'.join(likes_by)
-            p['likes'] = str(len(likes_by))
-            new_likes_count = len(likes_by)
-            break
+        try:
+            if int(p['id']) == post_id:
+                post_author_id = p.get('author_id')
+                likes_by = [x for x in (p.get('likes_by') or '').split(';') if x]
+                
+                if me in likes_by:
+                    likes_by = [x for x in likes_by if x != me]
+                    liked_now = False
+                else:
+                    likes_by.append(me)
+                    liked_now = True
+                
+                p['likes_by'] = ';'.join(likes_by)
+                p['likes'] = str(len(likes_by))
+                new_likes_count = len(likes_by)
+                break
+        except ValueError:
+            continue
 
-    # Reescreve arquivo
-    with open(POSTS_PATH, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(posts)
+    # Salva posts
+    save_posts(posts, fieldnames)
 
     # Cria notificação se curtiu
     if liked_now and post_author_id and post_author_id != me:

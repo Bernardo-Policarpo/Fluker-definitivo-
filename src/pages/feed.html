@@ -203,12 +203,37 @@
                   />
                   <div>
                     <h3>{{ p.author_name }}</h3>
-                    <small>{{ p.timestamp_display }}</small>
+                    <small id="timestamp-{{ p.id }}">{{ p.timestamp_display }}</small>
                   </div>
-                </div>
+
+                  <!-- Modal exclusivo deste post -->
+                  <div id="posts-modal-{{ p.id }}" class="hidden modal">
+                    <!-- Formulário de Modificação -->
+                    <form id="modify-form-{{ p.id }}" class="modify-post-form hidden" onsubmit="modifyPost(event, {{ p.id }})">
+                      <textarea id="modify-content-{{ p.id }}" rows="3" required>{{ p.content }}</textarea>
+                      <button type="submit">Salvar Modificação</button>
+                      <button type="button" onclick="cancelModify({{ p.id }})">Cancelar</button>
+                    </form>
+                    
+                    <!-- Botões de Ação (visíveis por padrão) -->
+                    <div id="action-buttons-{{ p.id }}">
+                      <button class="botoes-modal" onclick="prepareModify({{ p.id }}, '{{ p.content | e }}')">Modificar Postagem</button>
+                      <button class="botoes-modal" onclick="deletePost({{ p.id }})">Excluir Postagem</button>
+                    </div>
+
+                    <button type="button" class="botoes-modal" onclick="CloseModalPosts({{ p.id }})">X</button>
+                  </div>
+
+                  {% if p.author_id == user_id %}
+                  <!-- Botão que abre este modal, passando o ID do post e do autor -->
+                  <button class="botoes-modal" onclick="OpenModalPosts({{ p.id }}, {{ p.author_id }})" class="post-options-btn">
+                    ...
+                  </button>
+                  {% endif %}
+                  </div>
 
                 <!-- Conteúdo do post -->
-                <p>{{ p.content }}</p>
+                <p id="post-content-{{ p.id }}">{{ p.content }}</p>
 
                 <!-- Cálculo do estado "curtido" pelo usuário atual -->
                 {% set liked = (p.get('likes_by') or '') and (user_id in
