@@ -196,6 +196,7 @@ header {
   transition: background 0.2s;
   font-weight: bold;
   color: var(--cor-texto);
+  text-decoration: none;
 }
 .menu-dropdown li:hover {
   background-color: var(--cor-fundo);
@@ -397,16 +398,5 @@ main {
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px;
-}
-
-/* ========================================
-   FEED E POSTS
-   Container do feed principal e formulário de novo post
-   ======================================== */
-.feed-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 850px;
-  margin: 0 auto;
+  margin-top: 10px;
 }

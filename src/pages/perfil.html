@@ -1,33 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fluker - Perfil</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fluker - Perfil</title>
 
-    <!-- Favicon -->
-    <link
-      rel="shortcut icon"
-      href="{{ url_for('static', filename='images/Logo-Fluker.png') }}"
-      type="image/x-icon"
-    />
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/Logo-Fluker.png') }}" type="image/x-icon" />
 
-    <!-- CSS principal -->
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles/stylePerfil.css') }}"
-    />
+  <!-- CSS principal -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/stylePerfil.css') }}" />
 
-    <!-- React 18 via CDN (ambiente de desenvolvimento) -->
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-    ></script>
-  </head>
+  <!-- React 18 via CDN (ambiente de desenvolvimento) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+
 <body>
     <!-- Cabeçalho: logo, atalho para home, busca, notificações e menu do usuário -->
     <header>
@@ -75,99 +64,102 @@
         />
         <div class="menu-dropdown hidden" id="user-dropdown">
           <ul>
-            <li onclick="goToMyProfile()">Meu Perfil</li>
+            <li><a href="{{url_for('perfil_page')}}" method="GET">Meu Perfil</a></li>
             <li onclick="logout()">Sair</li>
           </ul>
         </div>
       </div>
     </header>
 
-    <!-- Layout principal -->
-    <div class="layout">
-      <main>
-        <!-- Seção de perfil (mostra meu perfil ou o de outro usuário) -->
-        <section id="perfil" class="content">
-          <div class="profile">
-            {% if profile_user %}
-            <!-- Perfil de outro usuário -->
-            <div class="avatar">
-              <img
-                src="{{ url_for('static', filename='images/perfil.jpg') }}"
-                alt="Foto de perfil"
-                class="perfil-principal"
-              />
-            </div>
+  <!-- Layout principal -->
+  <div class="layout">
+    <main>
+      <!-- Seção de perfil (mostra meu perfil ou o de outro usuário) -->
+      <section id="perfil" class="content">
+        <div class="profile">
+          {% if profile_user %}
+          <!-- Perfil de outro usuário -->
+          <div class="avatar">
+            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil"
+              class="perfil-principal" />
+          </div>
 
-            <!-- Nome do usuário visitado -->
-            <h2>{{ profile_user.username }}</h2>
+          <!-- Nome do usuário visitado -->
+          <h2>{{ profile_user.username }}</h2>
 
-            <!-- Estado de amizade e ações relacionadas (se não for meu perfil) -->
-            {% if not is_my_profile %} {% if are_we_friends %}
-            <p class="friend-status">✅ Amigos</p>
-            {% elif has_pending_request %}
-            <p class="friend-status">⏳ Solicitação enviada</p>
-            {% else %}
-            <form
-              action="{{ url_for('add_friend', user_id=profile_user.id) }}"
-              method="POST"
-            >
-              <button type="submit" class="add-friend-btn">
-                Adicionar Amigo
-              </button>
-            </form>
-            {% endif %} {% endif %}
-
-            <!-- Últimos 3 posts do usuário visitado -->
-            <h3>Últimos 3 posts:</h3>
-            <div class="posts">
-              {% if recent_posts %} {% for post in recent_posts %}
-              <div class="post">
-                <div class="post-header">
-                  <small>{{ post.timestamp_display }}</small>
-                </div>
-                <p>{{ post.content }}</p>
-                <div class="post-stats">
-                  <span>❤️ {{ post.likes }} curtidas</span>
-                </div>
+          <!-- Estado de amizade e ações relacionadas (se não for meu perfil) -->
+          {% if not is_my_profile %} {% if are_we_friends %}
+          <p class="friend-status">✅ Amigos</p>
+          {% elif has_pending_request %}
+          <p class="friend-status">⏳ Solicitação enviada</p>
+          {% else %}
+          <form action="{{ url_for('add_friend', user_id=profile_user.id) }}" method="POST">
+            <button type="submit" class="add-friend-btn">
+              Adicionar Amigo
+            </button>
+          </form>
+          {% endif %} {% endif %}
+        
+          <!-- Últimos 3 posts do usuário visitado -->
+          <h3>Últimos 3 posts:</h3>
+          <div class="posts">
+            {% if recent_posts %} {% for post in recent_posts %}
+            <div class="post">
+              <div class="post-header">
+                <small>{{ post.timestamp_display }}</small>
               </div>
-              {% endfor %} {% else %}
-              <p class="empty">Nenhum post ainda.</p>
-              {% endif %}
-            </div>
-
-            {% else %}
-            <!-- Meu perfil -->
-            <div class="avatar">
-              <img
-                src="{{ url_for('static', filename='images/perfil.jpg') }}"
-                alt="Foto de perfil"
-                class="perfil-principal"
-              />
-            </div>
-
-            <!-- Meu nome de usuário -->
-            <h2>{{ username }}</h2>
-
-            <!-- Meus últimos 3 posts -->
-            <h3>Meus últimos 3 posts:</h3>
-            <div class="posts">
-              {% if recent_posts %} {% for post in recent_posts %}
-              <div class="post">
-                <div class="post-header">
-                  <small>{{ post.timestamp_display }}</small>
-                </div>
-                <p>{{ post.content }}</p>
-                <div class="post-stats">
-                  <span>❤️ {{ post.likes }} curtidas</span>
-                </div>
+              <p>{{ post.content }}</p>
+              <div class="post-stats">
+                <span>❤️ {{ post.likes }} curtidas</span>
               </div>
-              {% endfor %} {% else %}
-              <p class="empty">Você ainda não fez nenhum post.</p>
-              {% endif %}
             </div>
+            {% endfor %} {% else %}
+            <p class="empty">Nenhum post ainda.</p>
             {% endif %}
           </div>
-        </section>
-        </main>
+
+          {% else %}
+          <!-- Meu perfil -->
+          <div class="avatar">
+            <img src="{{ url_for('static', filename='images/perfil.jpg') }}" alt="Foto de perfil"
+              class="perfil-principal" />
+          </div>
+
+          <!-- Meu nome de usuário -->
+          <h2>{{ username }}</h2>
+
+          <!-- Meus últimos 3 posts -->
+          <h3>Meus últimos 3 posts:</h3>
+          <div class="posts">
+            {% if recent_posts %} {% for post in recent_posts %}
+            <div class="post">
+              <div class="post-header">
+                <small>{{ post.timestamp_display }}</small>
+              </div>
+              <p>{{ post.content }}</p>
+              <div class="post-stats">
+                <span>❤️ {{ post.likes }} curtidas</span>
+              </div>
+            </div>
+            {% endfor %} {% else %}
+            <p class="empty">Você ainda não fez nenhum post.</p>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </section>
+    </main>
+
+    <!-- Exposição controlada do ID do usuário atual para uso em JS -->
+    <script>
+      window.CURRENT_USER_ID = "{{ session.get('user_id') }}";
+    </script>
+
+    <!-- Scripts legados do projeto -->
+    <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+
+    <!-- Scripts React/JS da aplicação (ex.: polling para atualizações) -->
+    <script src="{{ url_for('static', filename='scripts/reactPolling.js') }}"></script>
 </body>
+
 </html>

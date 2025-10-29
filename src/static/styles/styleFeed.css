@@ -4,9 +4,9 @@
    ======================================== */
 :root {
   /* Paleta principal */
-  --cor-principal: #8b4dff;
+  --cor-principal: #1f0f4b;
   --cor-secundaria: #a166ff;
-  --cor-fundo: #e9d8ff;
+  --cor-fundo: #a166ff;
   --cor-texto: #000000;
   --cor-botao: #f3f3f3;
   --variacao: #c39eff;
@@ -36,6 +36,11 @@ body {
 
 .hidden {
   display: none;
+}
+
+a {
+  text-decoration: none !important;
+  color: black !important;
 }
 
 .empty {
@@ -386,6 +391,10 @@ main {
   background-color: #f5eaff;
   padding: 20px;
   border-radius: 10px;
+  margin-top:2rem ;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .avatar {
   font-size: 50px;

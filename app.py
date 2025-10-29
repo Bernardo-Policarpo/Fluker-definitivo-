@@ -484,14 +484,10 @@ def recover_page():
     """Página de recuperação de senha"""
     return render_template('recoverpassword.html')
 
-@app.get('/perfil')
-def register_page():
-    """Página de perfil"""
-    return render_template('perfil.html')
-
 # ========================================
 # ROTAS - AUTENTICAÇÃO
 # ========================================
+
 
 @app.route('/salvar', methods=['POST'])
 def salvar():
@@ -591,7 +587,7 @@ def home_page():
 @login_required
 def meu_perfil():
     """Redireciona para o próprio perfil"""
-    return redirect(url_for('perfil.', user_id=session.get('user_id')))
+    return redirect(url_for('perfil', user_id=session.get('user_id')))
 
 @app.get('/perfil/<user_id>')
 @login_required

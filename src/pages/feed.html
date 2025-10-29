@@ -76,7 +76,7 @@
         />
         <div class="menu-dropdown hidden" id="user-dropdown">
           <ul>
-            <li><a href="{{ url_for(perfil) }}">Meu Perfil</a></li>
+            <li><a href="{{url_for('meu_perfil')}}" method="GET">Meu Perfil</a></li>
             <li onclick="logout()">Sair</li>
           </ul>
         </div>
