@@ -751,6 +751,269 @@ main {
   background: #ccc;
   cursor: not-allowed;
 }
+/* ========================================
+   MODAL DE POSTS - Minimalista e Responsivo
+   ======================================== */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 1px solid var(--cor-principal);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  width: 90%;
+  max-width: 320px;
+  z-index: 1000;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+/* Botões de ação */
+.botoes-modal {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  margin: 6px 0;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Modificar */
+.botoes-modal.modify {
+  background-color: var(--cor-principal);
+  color: #fff;
+}
+.botoes-modal.modify:hover {
+  background-color: var(--cor-secundaria);
+}
+
+/* Excluir */
+.botoes-modal.delete {
+  background-color: #e02424;
+  color: #fff;
+}
+.botoes-modal.delete:hover {
+  background-color: #c81e1e;
+}
+
+/* Fechar */
+.botoes-modal.close {
+  background: none;
+  color: #999;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  text-align: right;
+}
+
+/* Formulário de modificação */
+.modify-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.modify-post-form textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  background-color: #fafafa;
+  color: var(--cor-texto);
+}
+
+/* Botões do formulário */
+.modify-post-form button {
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--cor-principal);
+  color: #fff;
+  transition: background 0.2s ease;
+}
+.modify-post-form button:hover {
+  background-color: var(--cor-secundaria);
+}
+
+/* Botão de opções "..." */
+.post-options-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--cor-texto);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+.post-options-btn:hover {
+  background-color: var(--cor-fundo);
+}
+
+/* ========================================
+   MODAL DE POSTS - Minimalista e Responsivo
+   ======================================== */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 1px solid var(--cor-principal);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  width: 90%;
+  max-width: 320px;
+  z-index: 1000;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+/* Botões de ação */
+.botoes-modal {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  margin: 6px 0;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Modificar */
+.botoes-modal:nth-child(1) {
+  background-color: var(--cor-principal);
+  color: #fff;
+}
+.botoes-modal:nth-child(1):hover {
+  background-color: var(--cor-secundaria);
+}
+
+/* Excluir */
+.botoes-modal:nth-child(2) {
+  background-color: #e02424;
+  color: #fff;
+}
+.botoes-modal:nth-child(2):hover {
+  background-color: #c81e1e;
+}
+
+/* Fechar */
+.botoes-modal:last-child {
+  background: none;
+  color: #999;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  text-align: right;
+}
+
+/* Formulário de modificação */
+.modify-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.modify-post-form textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+  background-color: #fafafa;
+  color: var(--cor-texto);
+}
+
+/* Botões do formulário */
+.modify-post-form button {
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--cor-principal);
+  color: #fff;
+  transition: background 0.2s ease;
+}
+.modify-post-form button:hover {
+  background-color: var(--cor-secundaria);
+}
+
+/* Botão de opções "..." */
+.post-options-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--cor-texto);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+.post-options-btn:hover {
+  background-color: var(--cor-fundo);
+}
+
+/* ========================================
+   RESPONSIVO
+   ======================================== */
+@media (max-width: 480px) {
+  .modal {
+    width: 88vw;
+    padding: 14px;
+  }
+
+  .botoes-modal {
+    font-size: 12.5px;
+    padding: 6px;
+  }
+
+  .modify-post-form textarea {
+    font-size: 12.5px;
+    padding: 6px;
+  }
+
+  .modify-post-form button {
+    font-size: 12.5px;
+    padding: 6px;
+  }
+
+  .botoes-modal:last-child {
+    font-size: 15px;
+  }
+}
+
 
 
 /* ========================================

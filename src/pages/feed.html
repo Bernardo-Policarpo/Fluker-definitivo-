@@ -17,6 +17,9 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='styles/styleFeed.css') }}"
     />
+    <!-- Icone do lápis -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 
     <!-- React 18 via CDN (ambiente de desenvolvimento) -->
     <script
@@ -227,7 +230,7 @@
                   {% if p.author_id == user_id %}
                   <!-- Botão que abre este modal, passando o ID do post e do autor -->
                   <button class="botoes-modal" onclick="OpenModalPosts({{ p.id }}, {{ p.author_id }})" class="post-options-btn">
-                    ...
+                    <i class="fas fa-pencil-alt"></i>
                   </button>
                   {% endif %}
                   </div>

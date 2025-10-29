@@ -557,10 +557,8 @@ async function deletePost(postId) {
   /**
    * Envia requisição DELETE para excluir o post.
    */
-  if (!confirm("Tem certeza que deseja excluir este post? Esta ação é irreversível.")) {
-    return;
-  }
-  
+
+  // Fecha o modal do post
   CloseModalPosts(postId);
 
   try {
@@ -572,7 +570,6 @@ async function deletePost(postId) {
     const data = await response.json();
 
     if (response.ok && data.success) {
-      alert("Post excluído com sucesso!");
       // Remove o post da UI
       const postElement = document.querySelector(`.posts .post:has(.post-options-btn[onclick*="OpenModalPosts(${postId}"])`);
       if (postElement) {
@@ -589,6 +586,7 @@ async function deletePost(postId) {
     alert("Ocorreu um erro de rede ao tentar excluir o post.");
   }
 }
+
 
 async function modifyPost(event, postId) {
   /**
@@ -619,7 +617,6 @@ async function modifyPost(event, postId) {
     const data = await response.json();
 
     if (response.ok && data.success) {
-      alert("Post modificado com sucesso!");
       
       // Atualiza o conteúdo na UI
       const contentElement = document.getElementById(`post-content-${postId}`);
