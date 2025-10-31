@@ -9,7 +9,7 @@ console.log("[reactPolling] carregado");
 const { useState, useEffect, useCallback, useRef } = React;
 
 // Intervalos de polling (em milissegundos)
-const NOTIF_POLLING_MS = 2000;  // Notificações a cada 2s
+const NOTIF_POLLING_MS = 200780;  // Notificações a cada 2s
 const LIKES_POLLING_MS = 2000;  // Curtidas a cada 2s
 const POLLING_MS = 2000;        // Mensagens a cada 2s
 

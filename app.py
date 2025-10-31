@@ -16,9 +16,11 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from functools import wraps
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+from db import get_conn
 import secrets
-import csv
+import sqlite3
 import os
+import csv
 
 # ========================================
 # CONFIGURAÇÃO DE DIRETÓRIOS
@@ -30,7 +32,6 @@ DATA_DIR = os.path.join(SRC_DIR, 'data')
 STATIC_DIR = os.path.join(SRC_DIR, 'static')
 
 # Caminhos dos arquivos CSV
-CSV_PATH = os.path.join(DATA_DIR, 'users.csv')
 MESSAGES_PATH = os.path.join(DATA_DIR, 'messages.csv')
 POSTS_PATH = os.path.join(DATA_DIR, 'posts.csv')
 NOTIF_PATH = os.path.join(DATA_DIR, 'notifications.csv')
@@ -45,13 +46,6 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', secrets.token_hex(
 # ========================================
 # INICIALIZAÇÃO DOS ARQUIVOS CSV
 # ========================================
-
-def ensure_csv():
-    """Garante que o CSV de usuários existe"""
-    os.makedirs(DATA_DIR, exist_ok=True)
-    if not os.path.exists(CSV_PATH):
-        with open(CSV_PATH, 'w', newline='', encoding='utf-8') as f:
-            csv.writer(f).writerow(['id', 'username', 'password', 'email'])
 
 def ensure_messages_csv():
     """Garante que o CSV de mensagens existe"""
@@ -84,14 +78,6 @@ def ensure_friends_csv():
 # ========================================
 # GERADORES DE ID
 # ========================================
-
-def next_id():
-    """Retorna o próximo ID disponível para usuários"""
-    ensure_csv()
-    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        ids = [int(row['id']) for row in reader if row.get('id')]
-        return (max(ids) + 1) if ids else 1
 
 def next_message_id():
     """Retorna o próximo ID disponível para mensagens"""
@@ -491,21 +477,22 @@ def recover_page():
 @app.route('/salvar', methods=['POST'])
 def salvar():
     """Cria uma nova conta de usuário"""
-    ensure_csv()
     username = request.form.get('usuario', '').strip()
     password = request.form.get('senha', '').strip()
     email = request.form.get('email', '').strip()
 
     # Adiciona novo usuário
-    with open(CSV_PATH, 'a', newline='', encoding='utf-8') as f:
-        csv.writer(f).writerow([next_id(), username, password, email])
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", (username, password, email))
+    conn.commit()
+    conn.close()
 
     return redirect(url_for('index'))
 
 @app.post('/login')
 def login():
     """Faz login com username ou email"""
-    ensure_csv()
     login_input = request.form.get('usuario', '').strip()
     password = request.form.get('senha', '').strip()
 
@@ -513,25 +500,23 @@ def login():
         return redirect(url_for('index'))
 
     # Procura credenciais no CSV
-    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            row_user = (row.get('username') or '').strip()
-            row_email = (row.get('email') or '').strip()
-            row_pass = (row.get('password') or '').strip()
+    with get_conn() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                    SELECT id, username, password, email
+                    FROM users
+                    WHERE username = ? OR email = ?
+                    AND password = ? LIMIT 1
+                """, (login_input, login_input, password))
+        user = cur.fetchone()
 
-            credencial_ok = (login_input == row_user) or (login_input == row_email)
-            senha_ok = (password == row_pass)
-
-            if credencial_ok and senha_ok:
-                # Login bem-sucedido
-                session['user_id'] = row.get('id')
-                session['username'] = row_user
-                session['email'] = row_email
-                return redirect(url_for('home_page'))
-
-    # Credenciais inválidas
-    return redirect(url_for('index', erro=1))
+        if user is None:
+            return redirect(url_for('index'))
+        
+        session['user_id'] = user['id']
+        session['username'] = user['username']
+        session['email'] = user['email']
+        return redirect(url_for('home_page'))
 
 @app.get('/logout')
 def logout():
@@ -1112,7 +1097,6 @@ def api_friend_request_reject():
 
 if __name__ == '__main__':
     # Garante que todos os CSVs existem
-    ensure_csv()
     ensure_messages_csv()
     ensure_posts_csv()
     ensure_notifications_csv()
