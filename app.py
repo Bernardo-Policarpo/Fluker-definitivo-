@@ -484,6 +484,13 @@ def recover_page():
     """Página de recuperação de senha"""
     return render_template('recoverpassword.html')
 
+@app.get('/perfil_page')
+@login_required
+def perfil_page():
+    """Atalho para o próprio perfil — redireciona para /perfil/<meu_id>"""
+    return redirect(url_for('perfil', user_id=session.get('user_id')))
+
+
 # ========================================
 # ROTAS - AUTENTICAÇÃO
 # ========================================
@@ -592,7 +599,7 @@ def meu_perfil():
 @app.get('/perfil/<user_id>')
 @login_required
 def perfil(user_id):
-    """Página de perfil de um usuário"""
+    """Página de perfil de um usuário (página dedicada)"""
     profile_user = get_user_by_id(user_id)
     if not profile_user:
         return redirect(url_for('home_page'))
@@ -606,11 +613,9 @@ def perfil(user_id):
             if row.get('author_id') == str(user_id):
                 user_posts.append(row)
 
-    # Ordena e pega os 3 mais recentes
+    # Ordena (mais recente primeiro) e prepara timestamps
     user_posts.sort(key=lambda x: int(x['id']), reverse=True)
-    recent_posts = user_posts[:3]
-    
-    for p in recent_posts:
+    for p in user_posts:
         p['timestamp_display'] = to_sp_display(p.get('timestamp', ''))
 
     # Verifica relação com o usuário atual
@@ -619,17 +624,22 @@ def perfil(user_id):
     are_we_friends = are_friends(current_user_id, user_id)
     has_pending_request = check_pending_request(current_user_id, user_id)
 
+    # Pega solicitações pendentes do meu usuário (para o header/side)
+    friend_requests = get_friend_requests(current_user_id)
+
     return render_template(
-        'feed.html',
+        'perfil.html',
         profile_user=profile_user,
-        recent_posts=recent_posts,
+        posts=user_posts,           # todos os posts do usuário (pode usar paginação no template)
+        recent_posts=user_posts[:3],# se o template precisar só dos 3 mais recentes
         username=session.get('username'),
         user_id=current_user_id,
         is_my_profile=is_my_profile,
         are_we_friends=are_we_friends,
         has_pending_request=has_pending_request,
-        friend_requests=get_friend_requests(current_user_id)
+        friend_requests=friend_requests
     )
+
 
 # ========================================
 # ROTAS - POSTS
