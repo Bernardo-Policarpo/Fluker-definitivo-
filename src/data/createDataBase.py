@@ -3,66 +3,68 @@ import sqlite3
 # ========================================
 # Criar tabelas
 # ========================================
-conexao = sqlite3.connect("dataBase.db")
+conexao = sqlite3.connect("src/data/dataBase.db")
 cursor = conexao.cursor()
 
 #usuários
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  
-        username TEXT,
-        password TEXT,
-        email TEXT,
-        bio TEXT
-    )
-""")
+     CREATE TABLE IF NOT EXISTS users (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,  
+         username TEXT UNIQUE,
+         password TEXT,
+         email TEXT UNIQUE,
+         bio TEXT
+     )
+ """)
 
-#posts
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS posts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  
-        author_id INTEGER,
-        author_name TEXT,
-        timestamp TEXT,
-        content TEXT,
-        likes INTEGER,
-        likes_by TEXT
-    )
-""")
+# cursor.execute("DROP TABLE IF EXISTS users")
 
-#Notificações
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS notifications (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  
-        user_id INTEGER,
-        type TEXT,
-        actor_id INTEGER,
-        message_id INTEGER,
-        read INTEGER,
-        text TEXT
-    )
-""")
+# #posts
+# cursor.execute("""
+#     CREATE TABLE IF NOT EXISTS posts (
+#         id INTEGER PRIMARY KEY AUTOINCREMENT,  
+#         author_id INTEGER,
+#         author_name TEXT,
+#         timestamp TEXT,
+#         content TEXT,
+#         likes INTEGER,
+#         likes_by TEXT
+#     )
+# """)
 
-#Mensagens
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  
-        sender_id INTEGER,
-        receiver_id INTEGER,
-        timestamp TEXT,
-        content TEXT
-    )
-""")
+# #Notificações
+# cursor.execute("""
+#     CREATE TABLE IF NOT EXISTS notifications (
+#         id INTEGER PRIMARY KEY AUTOINCREMENT,  
+#         user_id INTEGER,
+#         type TEXT,
+#         actor_id INTEGER,
+#         message_id INTEGER,
+#         read INTEGER,
+#         text TEXT
+#     )
+# """)
 
-#Amigos
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS friends (  
-        user1_id INTEGER,
-        user2_id INTEGER,
-        status INTEGER,
-        timestamp TEXT
-    )
-""")
+# #Mensagens
+# cursor.execute("""
+#     CREATE TABLE IF NOT EXISTS messages (
+#         id INTEGER PRIMARY KEY AUTOINCREMENT,  
+#         sender_id INTEGER,
+#         receiver_id INTEGER,
+#         timestamp TEXT,
+#         content TEXT
+#     )
+# """)
+
+# #Amigos
+# cursor.execute("""
+#     CREATE TABLE IF NOT EXISTS friends (  
+#         user1_id INTEGER,
+#         user2_id INTEGER,
+#         status INTEGER,
+#         timestamp TEXT
+#     )
+# """)
 
 conexao.commit()
 

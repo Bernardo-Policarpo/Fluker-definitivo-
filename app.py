@@ -480,13 +480,16 @@ def salvar():
     username = request.form.get('usuario', '').strip()
     password = request.form.get('senha', '').strip()
     email = request.form.get('email', '').strip()
-
-    # Adiciona novo usuário
-    conn = get_conn()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", (username, password, email))
-    conn.commit()
-    conn.close()
+    try:
+        # Adiciona novo usuário
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", (username, password, email))
+        conn.commit()
+    except:
+        return redirect(url_for('register_page', msg='Usuário e/ou e-mail já cadastrados.'))
+    finally:
+        conn.close()
 
     return redirect(url_for('index'))
 
@@ -511,7 +514,7 @@ def login():
         user = cur.fetchone()
 
         if user is None:
-            return redirect(url_for('index'))
+            return redirect(url_for('index')),
         
         session['user_id'] = user['id']
         session['username'] = user['username']
