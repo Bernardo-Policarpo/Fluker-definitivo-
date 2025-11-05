@@ -203,39 +203,35 @@ def create_notification(user_id, type, actor_id=None, post_id=None, text=None):
 
 def get_all_users():
     """Retorna todos os usuários cadastrados (sem senha)"""
-    ensure_csv()
-    users = []
-    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for r in reader:
-            users.append({
-                'id': r['id'],
-                'username': r['username'],
-                'email': r['email'],
-            })
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT id, username, email FROM users")
+
+    users = [dict(row) for row in cur.fetchall()]
+    conn.close()
     return users
 
 def user_exists(user_id):
     """Verifica se um usuário existe pelo ID"""
-    ensure_csv()
-    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for r in reader:
-            if r.get('id') == str(user_id):
-                return True
-    return False
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT 1 id FROM users WHERE id = ? LIMIT 1", (user_id,))
+    exist = cur.fetchall() is not None
+    conn.close()
+    return exist
 
 def get_user_by_id(user_id):
     """Busca usuário por ID (sem senha)"""
-    ensure_csv()
-    with open(CSV_PATH, 'r', newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for r in reader:
-            if r.get('id') == str(user_id):
-                return {
-                    'id': r['id'],
-                    'username': r['username'],
-                    'email': r['email']
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT id, username, email from users WHERE id = ?", (user_id,))
+    row = cur.fetchall()
+    conn.close()
+    if row:
+            return {
+                'id': row['id'],
+                'username': row['username'],
+                'email': row['email']
                 }
     return None
 
