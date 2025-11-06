@@ -54,13 +54,14 @@
       </div>
     </div>
   </header>
-
+  <div class="banner">
+  <img src="{{ url_for('static', filename='images/banner-exemplo.jpg') }}" alt="Banner" class="banner-img">
+  <div class="banner-overlay"></div>
+</div>
   <!-- Layout principal -->
   <div class="layout">
+    
     <main>
-      <section>
-        <div class="banner"></div>
-      </section>
         <!-- Seção de perfil (mostra meu perfil ou o de outro usuário) -->
         <section id="perfil" class="content">
           <div class="profile perfil-container">

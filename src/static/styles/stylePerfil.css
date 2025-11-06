@@ -166,6 +166,7 @@ header {
   pointer-events: none;
   display: none;
 }
+
 .notif-badge.show {
   display: inline-block;
 }
@@ -190,11 +191,13 @@ header {
   z-index: 100;
   width: 160px;
 }
+
 .menu-dropdown ul {
   list-style: none;
   margin: 0;
   padding: 10px 0;
 }
+
 .menu-dropdown li {
   padding: 10px 15px;
   cursor: pointer;
@@ -203,6 +206,7 @@ header {
   color: var(--cor-texto);
   text-decoration: none;
 }
+
 .menu-dropdown li:hover {
   background-color: var(--cor-fundo);
 }
@@ -373,12 +377,16 @@ header {
 
 main {
   flex: 1;
-  padding: 80px 20px 20px 20px;
+  padding: 80px 0 20px 0;
+  /* tira o padding lateral */
   overflow-y: visible;
+  margin: 0;
 }
+
 .content {
   display: none;
 }
+
 .content.active {
   display: block;
 }
@@ -387,12 +395,17 @@ main {
    PERFIL
    Seção de exibição do perfil do usuário
    ======================================== */
+
+
 .profile {
-  background-color: white;
-  margin: 10px 0;
-  padding: 15px;
+  background-color: #f5eaff;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 4px 16px #ccc;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  max-width: 1000px;
 }
 
 .profile-posts {
@@ -401,13 +414,14 @@ main {
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 16px #ccc;
-  
+
 }
 
 .avatar {
   font-size: 50px;
   margin-bottom: 10px;
 }
+
 .perfil-principal {
   width: 100px;
   height: 100px;
@@ -417,23 +431,39 @@ main {
   margin-top: 10px;
 }
 
-
 .banner {
-  width: 100%;
-  height: 200px;
-  background-color: white;
-
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 101%;
+  max-width: 1600px;
+  height: 400px;
+  max-height: 480px;
+  box-sizing: border-box;
+  z-index: 0;
+  margin-bottom: -200px;
+  overflow: hidden;
 }
 
 
-/* Card individual de post */
-.posts .post {
-  background-color: white;
-  margin: 10px 0;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px #ccc;
-  
+.banner-img {
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* faz a imagem preencher como background-size: cover */
+}
+
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 80%, var(--cor-fundo) 100%);
+  /* o gradiente fica por cima da imagem */
+}
+
+
+/* remove eventuais scrolls horizontais indesejados */
+html,
+body {
+  overflow-x: hidden;
 }
 
 .feed-container {
@@ -442,15 +472,28 @@ main {
   border-radius: 10px;
   max-width: 850px;
   margin: 0 auto;
-  margin-top: 2rem;
+  margin-top: 1rem;
+
 }
 
+/* Ajuste no container do perfil para se sobrepor ao banner */
 .perfil-container {
-  background-color: #f5eaff;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 850px;
+  position: relative;
+  max-width: 1000px;
   margin: 0 auto;
+  padding: 0 20px 20px 20px;
+  /* mantém espaçamento interno */
+  /* quando o cartão estiver mais baixo que o banner, diminuímos a distância */
+}
+
+/* Card individual de post */
+.posts .post {
+  background-color: white;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px #ccc;
+
 }
 
 /* ========================================
@@ -533,6 +576,7 @@ main {
   border-radius: 12px 12px 0 0;
   flex-shrink: 0;
 }
+
 .chat-header-top h3 {
   margin: 0;
   font-size: 16px;
@@ -636,6 +680,7 @@ main {
   outline: none;
   transition: border-color 0.2s;
 }
+
 #chat-input:focus {
   border-color: var(--cor-principal);
 }
@@ -650,9 +695,11 @@ main {
   cursor: pointer;
   transition: background 0.2s;
 }
+
 #chat-send:hover:not(:disabled) {
   background: var(--cor-secundaria);
 }
+
 #chat-send:disabled {
   background: #ccc;
   cursor: not-allowed;
@@ -678,9 +725,11 @@ main {
   .chat-header-top {
     padding: 10px 12px;
   }
+
   .chat-header {
     padding: 10px;
   }
+
   .chat-select {
     font-size: 13px;
     padding: 6px 10px;
@@ -690,6 +739,7 @@ main {
     padding: 12px;
     gap: 6px;
   }
+
   .msg-line {
     font-size: 13px;
     max-width: 85%;
@@ -699,10 +749,12 @@ main {
     padding: 10px;
     gap: 6px;
   }
+
   #chat-input {
     font-size: 13px;
     padding: 8px 10px;
   }
+
   #chat-send {
     padding: 8px 14px;
     font-size: 13px;
@@ -753,9 +805,11 @@ main {
   .chat-header-top {
     padding: 10px 12px;
   }
+
   .chat-header {
     padding: 10px;
   }
+
   .chat-select {
     font-size: 12.5px;
     padding: 6px 10px;
@@ -765,6 +819,7 @@ main {
     padding: 10px;
     gap: 6px;
   }
+
   .msg-line {
     font-size: 12.5px;
     max-width: 88%;
@@ -774,10 +829,12 @@ main {
     padding: 10px;
     gap: 6px;
   }
+
   #chat-input {
     font-size: 12.5px;
     padding: 8px 10px;
   }
+
   #chat-send {
     font-size: 12.5px;
     padding: 8px 12px;
@@ -791,6 +848,7 @@ main {
     height: 65vh;
     right: 6px;
     bottom: calc(6px + 36px + 6px);
+
     .title-center {
       display: none;
     }
