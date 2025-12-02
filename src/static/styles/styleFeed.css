@@ -888,3 +888,64 @@ main {
     }
   }
 }
+/* =========================================
+   ESTILO DO BADGE DE NOTIFICAÇÃO (CORRIGIDO)
+   ========================================= */
+
+/* 1. Garante que o botão do sino seja a referência para a posição da bolinha */
+#notif-btn {
+  position: relative !important; /* Importante para não quebrar o layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 2. O estilo da bolinha vermelha */
+#notif-badge {
+  /* Posição flutuante no canto */
+  position: absolute;
+  top: -5px;     /* Sobe um pouco */
+  right: 15px;   /* Ajuste conforme o tamanho do seu ícone */
+  
+  /* Aparência */
+  background-color: #ff3b30; /* Vermelho iPhone */
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  
+  /* Tamanho e Forma */
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%; /* Faz virar uma bola perfeita */
+  border: 2px solid #fff; /* Borda branca para separar do ícone */
+  
+  /* Centralizar o número */
+  display: none; /* O JS muda para 'flex' quando precisar */
+  align-items: center;
+  justify-content: center;
+  
+  /* Efeitos */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 100;
+  padding: 0 4px;
+}
+
+/* 3. Animação de "Pop" quando chega notificação nova */
+#notif-badge.show {
+  display: flex !important;
+  animation: popBadge 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes popBadge {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+/* Ajuste específico para Mobile (se precisar) */
+@media (max-width: 768px) {
+  #notif-badge {
+    top: 0;
+    right: 5px;
+  }
+}
