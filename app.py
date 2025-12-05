@@ -358,5 +358,18 @@ def api_toggle_like(post_id):
     execute_db("UPDATE posts SET likes_by = ?, likes = ? WHERE id = ?", (';'.join(likes_by), len(likes_by), post_id))
     return jsonify({'success': True, 'likes': len(likes_by), 'liked': liked})
 
+# API de apagar as notificações
+@app.post('/api/notifications/clear_all')
+@login_required
+def api_clear_all_notifs():
+    try:
+        me = session.get('user_id')
+        # Deleta TODAS as notificações do usuário logado
+        execute_db("DELETE FROM notifications WHERE user_id = ?", (me,))
+        return jsonify({'ok': True})
+    except Exception as e:
+        print(f"Erro ao limpar notificações: {e}")
+        return jsonify({'ok': False}), 500
+
 if __name__ == '__main__':
     app.run(host="127.0.0.1", port=5001, debug=True)

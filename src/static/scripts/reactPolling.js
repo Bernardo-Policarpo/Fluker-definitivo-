@@ -1,11 +1,7 @@
-console.log("[reactPolling] Carregado para Modal Personalizado");
+console.log("[reactPolling] Carregado");
 
 const { useState, useEffect, useCallback, useRef } = React;
-
-// ========================================
-// CONFIGURAÇÕES
-// ========================================
-const POLLING_MS = 2000; // Atualiza a cada 2 segundos
+const POLLING_MS = 2000;
 
 // ========================================
 // 1. COMPONENTE: LISTA DE NOTIFICAÇÕES
@@ -13,7 +9,7 @@ const POLLING_MS = 2000; // Atualiza a cada 2 segundos
 function NotificationList() {
   const [notifications, setNotifications] = useState([]);
 
-  // Busca dados do servidor
+  // Busca notificações e atualiza Badge
   const fetchNotifs = useCallback(async () => {
     try {
       const res = await fetch("/api/notifications");
@@ -21,13 +17,12 @@ function NotificationList() {
         const data = await res.json();
         setNotifications(data.items);
 
-        // ATUALIZA O BADGE (BOLINHA VERMELHA) NO HEADER
-        // O React procura pelo elemento fora dele para atualizar o número
+        // Atualiza a bolinha vermelha no header
         const badge = document.getElementById("notif-badge");
         if (badge) {
             if (data.unread > 0) {
                 badge.innerText = data.unread > 99 ? "99+" : data.unread;
-                badge.style.display = "flex"; // Ou 'block', dependendo do seu CSS
+                badge.style.display = "flex";
                 badge.classList.add("show");
             } else {
                 badge.innerText = "";
@@ -36,25 +31,38 @@ function NotificationList() {
             }
         }
       }
-    } catch(e) { console.error(e); }
+    } catch(e) {}
   }, []);
 
-  // Polling automático
   useEffect(() => {
     fetchNotifs();
     const interval = setInterval(fetchNotifs, POLLING_MS);
-
-    // Escuta evento customizado caso o botão "Marcar todas como lidas" seja clicado fora do React
-    const handleRefresh = () => fetchNotifs();
-    window.addEventListener("refresh-notifs", handleRefresh);
-
-    return () => {
-        clearInterval(interval);
-        window.removeEventListener("refresh-notifs", handleRefresh);
-    };
+    return () => clearInterval(interval);
   }, [fetchNotifs]);
 
-  // Lógica de Aceitar/Recusar
+  // --- AÇÃO: MARCAR TODAS COMO LIDAS ---
+  const markAllRead = async () => {
+    try {
+        await fetch("/api/notifications/mark_all_read", { method: "POST" });
+        // Atualiza visualmente na hora
+        setNotifications(prev => prev.map(n => ({...n, read: "1"})));
+        const badge = document.getElementById("notif-badge");
+        if(badge) { badge.style.display = "none"; badge.innerText = ""; }
+    } catch(e) { console.error(e); }
+  };
+
+  // --- AÇÃO: LIMPAR TUDO (DIRETO, SEM AVISO) ---
+  const clearAll = async () => {
+    // REMOVI O ALERT DAQUI. CLICOU, LIMPOU.
+    try {
+        await fetch("/api/notifications/clear_all", { method: "POST" });
+        setNotifications([]); // Limpa a lista na hora
+        const badge = document.getElementById("notif-badge");
+        if(badge) { badge.style.display = "none"; badge.innerText = ""; }
+    } catch(e) { console.error(e); }
+  };
+
+  // --- AÇÃO: AMIZADE (SEM ALERTAS) ---
   const handleFriend = async (action, reqId) => {
     const url = action === 'accept' ? "/api/friend_request/accept" : "/api/friend_request/reject";
     try {
@@ -65,63 +73,83 @@ function NotificationList() {
       });
       
       const json = await res.json();
+      
       if (res.ok && json.ok) {
-        // Feedback visual rápido
-        alert(action === 'accept' ? "Agora vocês são amigos!" : "Solicitação removida.");
-        fetchNotifs(); // Atualiza a lista na hora
-        
-        // Se aceitou, recarrega a página para o Chat funcionar com o novo amigo
+        fetchNotifs();
         if(action === 'accept') window.location.reload(); 
       } else {
-        alert("Erro: " + (json.error || "Tente novamente."));
+        console.error("Erro na ação:", json.error);
       }
     } catch(e) { console.error(e); }
   };
 
-  // Renderização da Lista
-  if (notifications.length === 0) {
-      return React.createElement("div", { style: { padding: '20px', textAlign: 'center', color: '#666' } }, "Nenhuma notificação.");
-  }
-
-  return notifications.map(n => 
+  // --- RENDERIZAÇÃO ---
+  return React.createElement("div", { style: { display: 'flex', flexDirection: 'column', height: '100%' } },
+    
+    // 1. BARRA DE FERRAMENTAS
     React.createElement("div", { 
-        key: n.id, 
-        className: `notification-item ${n.read === "0" ? "unread" : ""}`,
-        style: {
-            padding: '10px',
-            borderBottom: '1px solid #eee',
-            backgroundColor: n.read === "0" ? '#f0f8ff' : 'transparent' // Realça não lidas
-        }
+        style: { 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            padding: '10px', 
+            borderBottom: '1px solid #ddd',
+            background: '#f9f9f9',
+            position: 'sticky',
+            top: 0,
+            zIndex: 10
+        } 
     },
-      // Texto da notificação
-      React.createElement("p", { style: { margin: '0 0 5px 0', fontWeight: n.read === "0" ? 'bold' : 'normal' } }, n.text),
-      
-      // Botões (SÓ PARA FRIEND REQUEST)
-      n.type === 'friend_request' && React.createElement("div", { style: { display: 'flex', gap: '10px', marginBottom: '5px' } },
         React.createElement("button", { 
-          onClick: () => handleFriend('accept', n.actor_id),
-          style: { 
-              background: '#28a745', color: '#fff', border: 'none', 
-              padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' 
-          }
-        }, "Aceitar"),
+            onClick: markAllRead,
+            style: { 
+                background: 'none', border: 'none', color: '#8b4dff', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px'
+            }
+        }, "Marcar como lidas"),
+        
         React.createElement("button", { 
-          onClick: () => handleFriend('reject', n.actor_id),
-          style: { 
-              background: '#dc3545', color: '#fff', border: 'none', 
-              padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' 
-          }
-        }, "Recusar")
-      ),
-      
-      // Data/Hora
-      React.createElement("small", { style: { color: '#888', fontSize: '11px' } }, n.timestamp_display)
+            onClick: clearAll,
+            style: { 
+                background: 'none', border: 'none', color: '#ff3b30', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px'
+            }
+        }, "Limpar as notificações")
+    ),
+
+    // 2. A LISTA
+    notifications.length === 0 
+    ? React.createElement("div", { style: { padding: '20px', textAlign: 'center', color: '#999' } }, "Nenhuma notificação.")
+    : React.createElement("div", { style: { overflowY: 'auto' } }, 
+        notifications.map(n => 
+            React.createElement("div", { 
+                key: n.id, 
+                style: {
+                    padding: '12px',
+                    borderBottom: '1px solid #eee',
+                    backgroundColor: n.read === "0" ? '#f0f8ff' : '#fff'
+                }
+            },
+            React.createElement("p", { style: { margin: '0 0 5px 0', fontWeight: n.read === "0" ? 'bold' : 'normal', fontSize: '14px' } }, n.text),
+            
+            // Botões de Amizade
+            n.type === 'friend_request' && React.createElement("div", { style: { display: 'flex', gap: '10px', marginTop: '5px' } },
+                React.createElement("button", { 
+                onClick: () => handleFriend('accept', n.actor_id),
+                style: { background: '#28a745', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }
+                }, "Aceitar"),
+                React.createElement("button", { 
+                onClick: () => handleFriend('reject', n.actor_id),
+                style: { background: '#dc3545', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }
+                }, "Recusar")
+            ),
+            
+            React.createElement("small", { style: { color: '#888', fontSize: '11px' } }, n.timestamp_display)
+            )
+        )
     )
   );
 }
 
 // ========================================
-// 2. CHAT DM (Mantido igual)
+// 2. CHAT DM
 // ========================================
 function ChatDM({ currentUserId }) {
   const currentUserNum = Number(currentUserId) || currentUserId;
@@ -194,7 +222,7 @@ function ChatDM({ currentUserId }) {
 }
 
 // ========================================
-// 3. LIKE BUTTON (Mantido igual)
+// 3. LIKE BUTTON
 // ========================================
 function LikeButton({ postId, initialLikes, initialLiked, currentUserId }) {
   const [likes, setLikes] = useState(parseInt(initialLikes) || 0);
@@ -234,41 +262,16 @@ function LikeButton({ postId, initialLikes, initialLiked, currentUserId }) {
 // ========================================
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    // 1. MONTA LISTA DE NOTIFICAÇÕES (No seu Modal)
     const notifListContainer = document.getElementById("notifications-list");
-    if (notifListContainer) {
-        const root = ReactDOM.createRoot(notifListContainer);
-        root.render(React.createElement(NotificationList));
-        console.log("✅ React conectado ao #notifications-list");
-    } else {
-        console.warn("⚠️ #notifications-list não encontrado. Modal não funcionará.");
-    }
+    if (notifListContainer) ReactDOM.createRoot(notifListContainer).render(React.createElement(NotificationList));
 
-    // 2. CONFIGURA BOTÃO 'MARCAR TODAS COMO LIDAS' (Do seu HTML)
-    const btnMarkAll = document.getElementById("mark-all-read");
-    if (btnMarkAll) {
-        btnMarkAll.addEventListener("click", () => {
-            fetch("/api/notifications/mark_all_read", { method: "POST" })
-                .then(() => {
-                    // Avisa o React para atualizar a lista
-                    window.dispatchEvent(new Event("refresh-notifs"));
-                    // Limpa o badge imediatamente
-                    const badge = document.getElementById("notif-badge");
-                    if(badge) { badge.style.display = 'none'; badge.innerText = ''; }
-                });
-        });
-    }
-
-    // 3. Chat
     const chatRoot = document.getElementById("dm-chat-root");
     if (chatRoot) ReactDOM.createRoot(chatRoot).render(React.createElement(ChatDM, { currentUserId: chatRoot.dataset.currentUserId }));
 
-    // 4. Likes
     document.querySelectorAll(".like-widget-root").forEach(r => {
         ReactDOM.createRoot(r).render(React.createElement(LikeButton, {
             postId: r.dataset.postId, initialLikes: r.dataset.initialLikes, initialLiked: r.dataset.liked, currentUserId: window.CURRENT_USER_ID
         }));
     });
-
   } catch (e) { console.error("Erro React:", e); }
 });

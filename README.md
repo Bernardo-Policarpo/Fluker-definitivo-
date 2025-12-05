@@ -12,7 +12,7 @@ Fluker é uma rede social em desenvolvimento criada por um grupo de amigos, com 
 ## 📖 Visão Geral
 
 O **Fluker** busca unir aprendizado prático em desenvolvimento web e diversão, criando uma experiência social moderna e leve.  
-Nosso foco está em **funcionalidades essenciais** de uma rede social, mas com **tecnologias simples** e **gestão de dados via CSV**, facilitando o entendimento e a colaboração entre os desenvolvedores.
+Nosso foco está em **funcionalidades essenciais** de uma rede social, mas com **tecnologias simples** e **gestão de dados via SQLITE3**, facilitando o entendimento e a colaboração entre os desenvolvedores.
 
 ---
 
@@ -33,7 +33,7 @@ Nosso foco está em **funcionalidades essenciais** de uma rede social, mas com *
 - **Python** — linguagem principal do projeto  
 - **Flask** — framework web usado para rotas e views  
 - **HTML, CSS e JavaScript** — para o front-end e interação do usuário  
-- **CSV** — utilizado como sistema principal de armazenamento de dados (usuários, postagens, mensagens, etc.)  
+- **SQLITE3** — utilizado como sistema principal de armazenamento de dados (usuários, postagens, mensagens, etc.)  
 - **PythonAnywhere** — hospedagem e deploy do projeto  
 
 ---
@@ -47,14 +47,13 @@ Organização do repositório:
 ```text
 fluker/
 ├── app.py
+├── db.py
 ├── README.md
 ├── requirements.txt
 ├── src/
 │   ├── data/
-│   │   ├── messages.csv
-│   │   ├── notifications.csv
-│   │   ├── posts.csv
-│   │   └── users.csv
+│   │   ├── createDataBase.py
+│   │   └── database.db
 │   │
 │   ├── pages/                   
 │   │   ├── index.html
@@ -69,13 +68,15 @@ fluker/
 │       │   └── styleFeed.css
 │       │
 │       ├── scripts/
+│       │   ├── reactPolling.js
 │       │   └── script.js
 │       │
 │       └── images/
 │           ├── coracao.png
+│           ├── Logo-Fluker.png
 │           ├── logo.png
 │           ├── logo1.png
-│           ├── Logo-Fluker.png
+│           ├── Lupa.png
 │           ├── perfil.jpg
 │           ├── redheart.png
 │           └── sino.png
